@@ -5,7 +5,12 @@ def load_observations(path): # ffunction to read csv file
     with open(path, newline="", encoding="utf-8") as stream:
         return list(csv.DictReader(stream))
 
+
 def parse_count(count_text): #function to interpret data input
+    
+    if not isinstance(count_text,str):
+        raise ValueError("Count must be text")
+
     if count_text == "":
         return None
     
@@ -16,18 +21,6 @@ def parse_count(count_text): #function to interpret data input
 
     return count_text
     
-
-
-def count_above(heights_cm, threshold_cm): # function to compare the plant height with threshold
-    above_threshold = 0
-    for height_cm in heights_cm:
-        if height_cm > threshold_cm:
-            above_threshold += 1
-    return above_threshold
-
-assert count_above([8, 12, 10, 15], 10) == 2
-assert count_above([10], 10) == 0
-assert count_above([ ],10) == 0
 
 # write summarise_site(rows, site)
 # INPUT: observations with site, date and count
@@ -99,3 +92,9 @@ def summarise_site(rows, site):
         known_total = None
 
     return (known_total, missing_count)
+
+
+if __name__ == "__main__":
+    rows = load_observations("data/bootcamp_observations.csv")
+    print(rows[0])
+    print(rows[2])
