@@ -1,2 +1,12 @@
+# Editor backups and temporary files
 *~
 *.tmp
+
+# Generated results and disposable tests
+/results/
+/sandbox/
+
+# Python virtual environment and caches
+.venv/
+__pycache__/
+*.pyc
