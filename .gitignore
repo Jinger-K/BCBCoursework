@@ -2,8 +2,7 @@
 *~
 *.tmp
 
-# Generated results and disposable tests
-/results/
+# Disposable tests
 /sandbox/
 
 # Python virtual environment and caches
