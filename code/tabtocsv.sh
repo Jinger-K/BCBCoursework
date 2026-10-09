@@ -29,7 +29,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 
-echo 'Creating a comma delimited version of %s ... \n' "$1"
+printf 'Creating a comma delimited version of %s ... \n' "$1"
 
 # cat $1 | tr -s "\t" "," >> $1.csv # Appends output to the file, cauding duplicate row on returns / unquoted paths can split at spaces / unquoted variable can turn wildcard characters into matching file paths
 # Preserve empty fields and replace old output. 
