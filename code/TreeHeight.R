@@ -10,6 +10,7 @@
 # OUTPUT
 # The heights of the tree, same units as "distance"
 
+# Define the function to calculate tree heights
 TreeHeight <- function(degrees, distance){
     radians <- degrees * pi /180
     height <- distance * tan(radians)
@@ -18,4 +19,11 @@ TreeHeight <- function(degrees, distance){
     return (height)
 }
 
-TreeHeight(37,40)
+# Load the data
+trees <- read.csv("data/trees.csv")
+
+# Calculate the heights
+trees$Tree.Height.m <- TreeHeight(trees$Angle.degrees, trees$Distance.m)
+
+# Write into csv
+write.csv(trees, "results/TreeHts.csv", row.names = FALSE)
