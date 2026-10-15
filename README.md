@@ -83,6 +83,88 @@ Both scripts accept one readable input file. Quote paths containing spaces. They
 
 Errors go to standard error. Exit status `0` means success, `1` indicates a file or processing error, and `2` indicates an incorrect argument count.
 
+### validate_record algorithm
+
+Inputs:
+- `row`: a dictionary containing one record.
+- `source_row`: its original CSV row number.
+- `accepted_ids`: identifiers of previously accepted records.
+
+Returns:
+- Accepted: `(cleaned_record, [])`.
+- Rejected: `(None, reasons)`.
+
+This function does not modify the input record or the accepted identifiers.
+The starter's `source_row` parameter is retained. The current validation
+logic does not use it; the row number will be used during batch processing
+to build issue reports.
+
+```text
+Create an empty reasons list.
+
+Check the identifier:
+    Read record_id and remove surrounding whitespace.
+    If empty, record the missing-value reason.
+    Otherwise:
+        Set the format flag to True.
+        If the length is not 5 or the first two characters are not uppercase ST:
+            Set the flag to False.
+        Loop through the remaining characters:
+            If a character is not in 0123456789:
+                Set the flag to False.
+        If the flag is False, add one invalid-identifier reason.
+        If the identifier is in accepted_ids, add the duplicate reason.
+
+Check the location:
+    Read location and remove surrounding whitespace.
+    If empty, record the missing-value reason.
+    Otherwise:
+        Set location_found to False.
+        Loop through the allowed locations, comparing lowercase versions.
+        If a match is found:
+            Set location_found to True.
+            Replace location with the canonical name from the list.
+        After the loop, record an invalid location if no match was found.
+
+Check genus and species:
+    Read genus and species and remove surrounding whitespace.
+    Set each found flag to False before its missing-value check.
+    For each field:
+        If empty, record its missing-value reason.
+        Otherwise:
+            Loop through its allowed names, ignoring case.
+            When a match is found, set the flag to True and save the canonical name.
+            After the loop, record an invalid value if no match was found.
+
+Check the genus/species pair:
+    Only if genus_found and species_found are both True:
+        Form a tuple from the canonical genus and species.
+        If it is not in the allowed pairs, record an invalid combination.
+
+Check distance, then angle:
+    Read the field and remove surrounding whitespace.
+    If empty, record its missing-value reason.
+    Otherwise:
+        Try to convert it with float.
+        If ValueError occurs, record an invalid value.
+        If conversion succeeds:
+            Check whether the number is finite using math.isfinite.
+            If not finite, record an invalid value.
+            Otherwise, check the range given in the metadata:
+                Distance must be greater than 0 and no greater than 100.
+                Angle must be greater than 0 and less than 90.
+                Record an out-of-range reason if the check fails.
+
+After all checks:
+    If reasons is not empty:
+        Return None and reasons.
+    Otherwise:
+        Create a new dictionary containing the original six fields.
+        Use the cleaned identifier and canonical names.
+        Convert distance and angle back to text using str.
+        Return the new dictionary and the empty reasons list.
+```
+
 ## Testing
 
 Check syntax from `code/`:
