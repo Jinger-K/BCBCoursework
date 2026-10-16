@@ -1,0 +1,22 @@
+# Basic plotting commands in R practice
+# Data: a dataset on Consumer-Resource (e.g., Predator-Prey) body mass ratios taken from the Ecological Archives of the ESA (Barnes et al. 2008, Ecology 89:881)
+
+# Load data
+MyDF <- read.csv("data/ecol_archives_e_089_51_d_1.csv")
+dim(MyDF) #check the size of the data frame you loaded
+
+# Use dplyr to inspect and explore data
+require(tidyverse)
+glimpse(MyDF)
+
+# Change some grouping variables to factor
+MyDF$Type.of.feeding.interaction <- as.factor(MyDF$Type.of.feeding.interaction)
+MyDF$Location <- as.factor(MyDF$Location)
+str(MyDF)
+
+# Convert mg to g and adjust mass values
+unique(MyDF$Prey.mass.unit) # Check whether the units are the same
+MyDF$Prey.mass[MyDF$Prey.mass.unit == "mg"] <- MyDF$Prey.mass[MyDF$Prey.mass.unit == "mg"] / 1000
+MyDF$Prey.mass.unit[MyDF$Prey.mass.unit == "mg"] <- "g"
+
+# Explore figures below
