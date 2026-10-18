@@ -52,7 +52,7 @@ def validate_record(
         reasons.append("missing record_id") # Report missing record
     else: # Check validity of existing record
         flag = True
-        if len(record_id) != 5 or record_id[:2] !== "ST":
+        if len(record_id) != 5 or record_id[:2] != "ST":
             flag = False
         for character in record_id[2:]:
             if character not in "0123456789":
@@ -181,12 +181,72 @@ def process_records(
     rows: Iterable[dict[str, str]],
 ) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
     """Separate accepted records from rejected-row reports."""
-    raise NotImplementedError("Complete the record-processing workflow")
+    cleaned_records = []
+    error_log = []
+    accepted_ids = set()
+
+    source_row = 2 # Initialise source row
+
+    for row in rows:
+        cleaned_record, reasons = validate_record(row, source_row, accepted_ids)
+        
+        if cleaned_record is not None:
+            cleaned_records.append(cleaned_record)
+            accepted_ids.add(cleaned_record["record_id"])
+        else:
+            reasons_temp = ""
+
+            for reason in reasons:
+                reasons_temp = reasons_temp + reason + "; "
+
+            reasons_temp = reasons_temp[:-2] # Exclude final "; "
+
+            issue = {
+                "source_row": str(source_row),
+                "record_id": row["record_id"].strip(),
+                "reasons": reasons_temp
+            }
+
+            error_log.append(issue)
+            
+        
+        source_row = source_row + 1
+
+    # Sort the cleaned data
+    # Sort the accepted identifiers
+    sorted_ids = sorted(accepted_ids)
+
+    #Arrange the complete records in identifier order
+    sorted_records = []
+
+    for record_id in sorted_ids:
+        for record in cleaned_records:
+            if record["record_id"] == record_id:
+                sorted_records.append(record)
+
+    return sorted_records, error_log
+
 
 
 def summarise_oaks(clean_records: Iterable[dict[str, str]]) -> list[dict[str, str]]:
     """Count accepted oak records by species."""
-    raise NotImplementedError("Complete the oak summary")
+    counts = {}
+    for record in clean_records:
+        if record["genus"] == "Quercus":
+            species = record["species"]
+            if species not in counts:
+                counts[species] = 0
+            counts[species] += 1
+    
+    oak_counts = []
+    sorted_counts = sorted(counts)
+    for species in sorted_counts:
+        species_count = {
+            "species":species,
+            "count":str(counts[species])
+        }
+        oak_counts.append(species_count)
+    return oak_counts
 
 
 def write_csv(

@@ -165,6 +165,99 @@ After all checks:
         Return the new dictionary and the empty reasons list.
 ```
 
+### process_records algorithm
+
+Input: the original records, `rows`.
+
+Returns: `(sorted_records, error_log)`, containing accepted records sorted
+by identifier and issue reports in source-row order.
+
+```text
+Create an empty cleaned_records list for accepted records.
+Create an empty error_log list for issue reports.
+Create an empty accepted_ids set for accepted identifiers.
+Set source_row to 2 because the CSV header is line 1.
+
+Loop through rows in input order:
+
+    Call validate_record with:
+        The current row
+        The current source_row
+        The accepted_ids set
+
+    Receive cleaned_record and reasons.
+
+    If cleaned_record is not None:
+        Append the complete cleaned record to cleaned_records.
+        Add its record_id to accepted_ids.
+
+    Otherwise:
+        Create an empty reasons_temp string.
+        Loop through reasons in their existing order:
+            Append the current reason and "; " to reasons_temp.
+        Use slicing to remove the final semicolon and space.
+
+        Create an issue dictionary containing:
+            source_row: the current row number converted to a string.
+            record_id: the identifier from the original row, with surrounding whitespace removed.
+            reasons: the combined reason string.
+
+        Append issue to error_log.
+        Do not add the identifier to accepted_ids.
+
+    Increase source_row by 1, whether the record was accepted or rejected.
+
+After processing all records:
+    Sort accepted_ids using sorted, producing sorted_ids.
+    Create an empty sorted_records list.
+
+    For each identifier in sorted_ids:
+        Loop through cleaned_records:
+            If the record_id matches the current identifier:
+                Append the complete record to sorted_records.
+
+Return sorted_records and error_log.
+```
+
+Validate in input order before sorting accepted records, so duplicate
+identifiers are handled in the correct order. Only accepted records reserve
+identifiers. Issue reports are appended in source-row order and need no
+additional sorting. Empty input returns two empty lists. This function
+does not write files.
+
+### summarise_oaks algorithm
+
+Input: the accepted records, `clean_records`.
+
+Returns: a list of dictionaries sorted by species, each containing
+`species` and `count`.
+
+```text
+Create an empty counts dictionary, mapping species names to integer counts.
+
+Loop through clean_records:
+    If the current record's genus is exactly "Quercus":
+        Read its species.
+
+        If species is not yet in counts:
+            Initialise its count to 0.
+
+        Increase its count by 1.
+
+After counting all records:
+    Create an empty oak_counts list.
+    Use sorted(counts) to sort the dictionary keys, producing sorted_counts.
+
+    For each species name in sorted_counts:
+        Create a species_count dictionary containing:
+            species: the current species name.
+            count: its value from counts, converted to a string.
+
+        Append species_count to oak_counts.
+
+Return oak_counts.
+```
+
 ## Testing
 
 Check syntax from `code/`:
