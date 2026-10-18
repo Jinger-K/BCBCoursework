@@ -5,9 +5,12 @@ Email: [kj726@ic.ac.uk](mailto\:kj726@ic.ac.uk)
 
 ## Purpose
 
-This repository contains UNIX, Bash and Git coursework.
-The three assessed exercises analyse FASTA sequences and replace tabs with commas and commas with spaces.
-Additional Python classroom exercises are retained in `code/`.
+This repository contains coursework and practical exercises from the Biological Computing Bootcamp.
+
+Assignment 1 covers UNIX commands, FASTA analysis and delimiter conversion.
+Assignment 2 validates synthetic tree-survey records and produces cleaned data, issue reports and oak counts.
+
+Additional Python and R classroom exercises are kept in `code/`.
 
 ## Project structure
 
@@ -15,12 +18,27 @@ Additional Python classroom exercises are retained in `code/`.
 BCBCoursework/
 ├── README.md
 ├── .gitignore
+├── Feedback/
+│   └── assignment-1-2026.md
 ├── code/
-│   ├── unixPrac1.txt
-│   ├── tabtocsv.sh
+│   ├── TreeHeight.R
+│   ├── basic_io.R
+│   ├── basic_plotting_commands_in_R
+│   ├── boilerplate.R
+│   ├── break.R
+│   ├── clean_silwood_trees.py
+│   ├── control_flow.R
 │   ├── csvtospace.sh
+│   ├── data_wrang.R
+│   ├── data_wrang_tidy.R
 │   ├── loops.py
-│   └── observations_practice.py
+│   ├── next.R
+│   ├── observations_practice.R
+│   ├── observations_practice.py
+│   ├── r_conditionals.R
+│   ├── tabtocsv.sh
+│   ├── test_silwood_trees.py
+│   └── unixPrac1.txt
 ├── data/
 │   ├── fasta/
 │   │   ├── 407228326.fasta
@@ -31,10 +49,12 @@ BCBCoursework/
 │   │   ├── 1801.csv
 │   │   ├── 1802.csv
 │   │   └── 1803.csv
+│   ├── silwood_trees_metadata.md
+│   ├── silwood_trees_raw.csv
 │   └── tab-example.tsv
 ├── results/
 │   └── .gitkeep
-└── sandbox/              # Optional; local only
+└── sandbox/                  # Optional; local only
 ```
 
 Required code and inputs are committed. Generated results, temporary files and the local virtual environment are ignored. Only `.gitkeep` is tracked inside `results/`.
@@ -45,15 +65,21 @@ Tested on Ubuntu 26.04.1 LTS with Bash 5.3.9 and Git 2.53.0. Python 3.14.4 is us
 
 The UNIX exercises require bc for decimal division, alongside standard command-line tools such as tail, grep and xargs.
 
+The Assignment 2 cleaner and test script require Python 3 and use only the standard library. No additional Python packages are needed.
+
 ## Data
 
 FASTA and temperature files were supplied with the [MulQuaBio course materials](https://mulquabio.github.io/MQB/) and are kept unchanged.
 
 tab-example.tsv is a small test file containing an empty field. All required inputs are included in `data/`.
 
+The synthetic tree survey and its metadata were supplied with the MulQuaBio practical.
+They are stored unchanged as `data/silwood_trees_raw.csv` and
+`data/silwood_trees_metadata.md`.
+
 ## Usage
 
-Run from the project's `code/` directory:
+For the Assignment 1 commands below, start from the project root and enter `code/`:
 
 ```bash
 cd code
@@ -82,6 +108,28 @@ Output: `results/1800.csv.txt`. Repeat with `1801.csv`, `1802.csv` and `1803.csv
 Both scripts accept one readable input file. Quote paths containing spaces. They create `results/` if needed, preserve empty fields and replace previous output on reruns.
 
 Errors go to standard error. Exit status `0` means success, `1` indicates a file or processing error, and `2` indicates an incorrect argument count.
+
+### Assignment 2: Tree-survey validation
+
+Run the cleaner from the project root. If the terminal is still inside `code/`,
+run `cd ..` first.
+
+```bash
+python3 code/clean_silwood_trees.py
+```
+
+The program reads `data/silwood_trees_raw.csv` and creates or replaces:
+
+| Output | Contents |
+| --- | --- |
+| `results/silwood_trees_clean.csv` | Accepted records, sorted by `record_id`. |
+| `results/silwood_tree_issues.csv` | Rejected source rows, cleaned identifiers and ordered reasons. |
+| `results/oak_species_counts.csv` | Accepted oak counts by species, sorted by species. |
+
+The program creates `results/` when needed and leaves the raw survey unchanged.
+The generated files are excluded from Git.
+
+The algorithms below describe the three implemented functions.
 
 ### validate_record algorithm
 
@@ -260,6 +308,8 @@ Return oak_counts.
 
 ## Testing
 
+### Assignment 1
+
 Check syntax from `code/`:
 
 ```bash
@@ -275,13 +325,49 @@ All four temperature files converted successfully. Their output line counts were
 
 Normal-input checks were also completed successfully from a fresh clone on 9 October 2026.
 
+### Assignment 2
+
+Run the test script from the project root:
+
+```bash
+python3 code/test_silwood_trees.py
+```
+
+The script uses constructed records and `assert` checks without changing the survey.
+All 12 test sections passed. They cover text cleaning, missing and unrecognised
+values, taxon pairs, invalid and out-of-range measurements, duplicate identifiers,
+multiple rejection reasons, record processing, and oak summaries.
+
+One useful test checks that `nan` and `inf` are rejected as invalid measurements. This detects a validation error where successful conversion to a number is incorrectly treated as sufficient for acceptance.
+
+Repeated-run consistency and the unchanged raw input were checked manually.
+Import behaviour, automatic creation of `results/`, and output contents were
+also checked separately from the function tests.
+
 ## Limitations
 
+### Assignment 1
 - FASTA commands assume the supplied single-record files and uppercase sequence letters. `wc -l` counts newlines; the two numbered FASTA files lack a final newline.
 - Ambiguous bases are included in sequence length but excluded from the AT/GC ratio.
 - The converters replace characters rather than fully parsing CSV/TSV. Quoted delimiters and spaces within fields may produce ambiguous output.
 - Input and output must be independent files; links between them are not checked. Existing output is overwritten.
 
+### Assignment 2
+
+- Source-row numbering assumes one record per line, with no blank lines between records.
+- Each input record must contain all six fields as strings. Empty cells are handled, but structurally missing fields that CSV reading represents as `None` are not supported.
+- The cleaner supports only the column layout, locations and taxon pairs specifies in the supplied metadata.
+
+The supplied survey was checked and satisfies these assumptions, so these limitations
+do not affect this dataset.
+
 ## AI assistance
 
-ChatGPT was used during 1–9 October 2026 for explanations, error interpretation, code review, small-test suggestions and documentation help for the three assessed tasks. Adopted suggestions were checked against course material and through terminal tests, output inspection and file comparisons.
+For Assignment 1, ChatGPT was used during 1–9 October 2026 for explanations, error interpretation, code review, small-test suggestions and documentation help for the three assessed tasks. Adopted suggestions were checked against course material and through terminal tests, output inspection and file comparisons.
+
+For Assignment 2, I used ChatGPT as a tutor during 13–18 October 2026
+to explain Python concepts and task requirements, discuss my algorithm ideas,
+understand errors, suggest small test cases, and help organise and clarify
+the README documentation. I checked the guidance against
+the course materials and metadata, traced examples by hand, and ran my tests
+and inspected the outputs.
