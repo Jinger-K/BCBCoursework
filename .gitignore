@@ -9,3 +9,7 @@
 .venv/
 __pycache__/
 *.pyc
+
+# Ignore generated results but keep the directory placeholder
+/results/*
+!/results/.gitkeep
