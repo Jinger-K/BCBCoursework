@@ -1,11 +1,10 @@
-# This function calculates heights of trees given distance of each tree
-# from its base and angle to its top, using the trigonometric formula
+# Calculate tree heights using:
 #
-# height = distance * tan(radians)
+# height = distance * tan(degrees * pi / 180)
 #
 # ARGUMENTS
-# degrees: The angle of elevations of tree
-# distance: The distance from base of tree (e.g., meters)
+# degrees: The angle of elevations of tree, measured from horizontal in degrees
+# distance: Horizontal distance from the observer to the tree, in metres
 #
 # OUTPUT
 # The heights of the tree, same units as "distance"
@@ -31,10 +30,10 @@ print(head(trees))
 required_columns <- c("Species", "Distance.m", "Angle.degrees")
 
 if(!all(required_columns %in% names(trees))) {
-    stop("Input file does not have all three require columns: Species, Distance.m and Angle.degrees.")
+    stop("Input file does not have all three required columns: Species, Distance.m and Angle.degrees.")
 }
 
-# Check for mumeric finite Distance.m and Angle.degrees
+# Check for numeric finite Distance.m and Angle.degrees
 if(!is.numeric(trees$Distance.m)) {
     stop("Distance.m must be numeric.")
 }
@@ -44,10 +43,10 @@ if(!is.numeric(trees$Angle.degrees)) {
 
 # Check if the values are finite in case it fails if()
 if(!all(is.finite(trees$Distance.m))) {
-    stop("Distance.m must and only contain finite values.")
+    stop("Distance.m must contain only finite values.")
 }
 if(!all(is.finite(trees$Angle.degrees))) {
-    stop("Angle.degrees must and only contain finite values.")
+    stop("Angle.degrees must contain only finite values.")
 }
 
 # Check if 0 < Distance.m <= 100
@@ -69,5 +68,6 @@ trees$height_m <- TreeHeight(trees$Angle.degrees, trees$Distance.m)
 if(!dir.exists("results")) {
     dir.create("results")
 }
+
 # Write into csv
 write.csv(trees, "results/TreeHts.csv", row.names = FALSE) # The file will be replaced on rerun
