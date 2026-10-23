@@ -84,7 +84,7 @@ if(!all(trees$Angle.degrees > 0 & trees$Angle.degrees < 90)) {
 # Make sure the columns are organised in the required order
 trees <- trees[, required_columns]
 
-browser()
+# browser()
 
 # Calculate the heights
 trees$height_m <- TreeHeight(trees$Angle.degrees, trees$Distance.m)
