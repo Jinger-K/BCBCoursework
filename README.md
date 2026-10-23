@@ -9,6 +9,7 @@ This repository contains coursework and practical exercises from the Biological 
 
 Assignment 1 covers UNIX commands, FASTA analysis and delimiter conversion.
 Assignment 2 validates synthetic tree-survey records and produces cleaned data, issue reports and oak counts.
+Assignment 3 calculates tree heights using fixed-input and command-line R scripts, and compares plant species richness and abundance among cultivation treatments at Pound Hill.
 
 Additional Python and R classroom exercises are kept in `code/`.
 
@@ -19,25 +20,32 @@ BCBCoursework/
 ├── README.md
 ├── .gitignore
 ├── Feedback/
-│   └── assignment-1-2026.md
+│   ├── assignment-1-2026.md
+│   └── assignment-2-2026.md
 ├── code/
 │   ├── TreeHeight.R
 │   ├── basic_io.R
 │   ├── basic_plotting_commands_in_R
 │   ├── boilerplate.R
 │   ├── break.R
+│   ├── browse.R
 │   ├── clean_silwood_trees.py
 │   ├── control_flow.R
 │   ├── csvtospace.sh
 │   ├── data_wrang.R
 │   ├── data_wrang_tidy.R
+│   ├── debugme.py
+│   ├── get_TreeHeight.R
 │   ├── loops.py
 │   ├── next.R
 │   ├── observations_practice.R
 │   ├── observations_practice.py
+│   ├── pound_hill_analysis.R
 │   ├── r_conditionals.R
+│   ├── run_get_TreeHeight.sh
 │   ├── tabtocsv.sh
 │   ├── test_silwood_trees.py
+│   ├── try.R
 │   └── unixPrac1.txt
 ├── data/
 │   ├── fasta/
@@ -49,12 +57,14 @@ BCBCoursework/
 │   │   ├── 1801.csv
 │   │   ├── 1802.csv
 │   │   └── 1803.csv
+│   ├── pound_hill_data.csv
+│   ├── pound_hill_meta_data.csv
 │   ├── silwood_trees_metadata.md
 │   ├── silwood_trees_raw.csv
-│   └── tab-example.tsv
-├── results/
-│   └── .gitkeep
-└── sandbox/                  # Optional; local only
+│   ├── tab-example.tsv
+│   └── trees.csv
+└── results/
+    └── .gitkeep
 ```
 
 Required code and inputs are committed. Generated results, temporary files and the local virtual environment are ignored. Only `.gitkeep` is tracked inside `results/`.
@@ -67,6 +77,15 @@ The UNIX exercises require bc for decimal division, alongside standard command-l
 
 The Assignment 2 cleaner and test script require Python 3 and use only the standard library. No additional Python packages are needed.
 
+The Assignment 3 analyses require R. The R analyses were tested with R 4.5.2 (2025-10-31).
+The tree-height scripts use base R only. The Pound Hill analysis requires
+`reshape2`, `dplyr` and `ggplot2`.
+
+Install missing packages from an R session:
+
+```r
+install.packages(c("reshape2", "dplyr", "ggplot2"))
+
 ## Data
 
 FASTA and temperature files were supplied with the [MulQuaBio course materials](https://mulquabio.github.io/MQB/) and are kept unchanged.
@@ -76,6 +95,13 @@ tab-example.tsv is a small test file containing an empty field. All required inp
 The synthetic tree survey and its metadata were supplied with the MulQuaBio practical.
 They are stored unchanged as `data/silwood_trees_raw.csv` and
 `data/silwood_trees_metadata.md`.
+
+The supplied tree-height table is stored unchanged as `data/trees.csv`.
+It contains 120 records with the columns `Species`, `Distance.m` and `Angle.degrees`.
+
+The supplied Pound Hill files are stored unchanged as
+`data/pound_hill_data.csv` and `data/pound_hill_meta_data.csv`.
+The metadata specifies that blank species counts represent observed absences, which are converted to zero during analysis.
 
 ## Usage
 
@@ -306,6 +332,72 @@ After counting all records:
 Return oak_counts.
 ```
 
+### Assignment 3: Tree-height calculation
+
+Run all commands from the project root.
+
+The fixed-input script reads only `data/trees.csv` and writes
+`results/TreeHts.csv`:
+
+```bash
+Rscript code/TreeHeight.R
+```
+
+It can also be run from an R session started at the project root:
+
+```r
+source("code/TreeHeight.R")
+```
+
+The generalised script accepts exactly one readable CSV path with the same
+three required columns:
+
+```bash
+Rscript code/get_TreeHeight.R data/trees.csv
+```
+
+For this input, the output is `results/trees_treeheights.csv`.
+The shell wrapper runs this command and returns a non-zero exit status
+if it fails:
+
+```bash
+bash code/run_get_TreeHeight.sh
+```
+
+Both R scripts calculate
+`height_m = Distance.m * tan(Angle.degrees * pi / 180)`.
+They preserve input record order and produce the four columns
+`Species`, `Distance.m`, `Angle.degrees` and `height_m`.
+They create `results/` if needed and replace existing results on reruns.
+
+### Assignment 3: Pound Hill analysis
+
+Run from the project root:
+
+```bash
+Rscript code/pound_hill_analysis.R
+```
+
+The script reads the supplied data and metadata, converts blank species
+counts to observed zeros, reshapes the data to long form, and checks counts.
+
+Richness is calculated separately for each quadrat as the number of
+species with `Count > 0`. Quadrat richness is then averaged within each
+plot, so plots with more sampled quadrats do not receive greater weight
+in the treatment comparison.
+
+Outputs:
+
+| Output | Contents |
+| --- | --- |
+| `results/pound_hill_plot_richness.csv` | One row per plot, containing `Cultivation`, `Block`, `Plot` and `MeanRichness`. |
+| `results/pound_hill_plot_richness.pdf` | Individual plot-level mean richness values by cultivation treatment, coloured by block. |
+
+The script also calculates total abundance within each quadrat and its mean within each plot. The abundance summary is printed to the terminal and compared with richness in the script comments.
+
+The figure shows one mean quadrat richness value per plot, with colours identifying blocks. May has the highest typical richness, while March and October are lower. Plot values vary within treatments and overlap between treatments; the figure alone does not establish causation.
+
+
 ## Testing
 
 ### Assignment 1
@@ -344,6 +436,21 @@ Repeated-run consistency and the unchanged raw input were checked manually.
 Import behaviour, automatic creation of `results/`, and output contents were
 also checked separately from the function tests.
 
+### Assignment 3
+
+All analyses were run independently from the project root and rerun
+successfully.
+
+- Tree heights: outputs had the required four columns and 120 records
+  in input order. The first record was checked against the formula,
+  and a separate 8 m, 45-degree measurement returned 8 m. Reruns produced
+  identical CSV files. Command-line error cases and numeric boundaries
+  were checked, and interactive debugging with `browser()` was completed.
+- Pound Hill: the richness CSV contained 12 plots, each appearing once,
+  with four plots per treatment. The saved PDF was inspected, and rerunning
+  produced an identical CSV.
+
+
 ## Limitations
 
 ### Assignment 1
@@ -361,6 +468,17 @@ also checked separately from the function tests.
 The supplied survey was checked and satisfies these assumptions, so these limitations
 do not affect this dataset.
 
+### Assignment 3: Tree-height calculation
+
+- Measurements must satisfy the specified numeric, finite-value and range checks. The scripts validate inputs rather than clean invalid records.
+- The generalised script uses the input basename to name its output. Inputs from different directories with the same basename target the same result file, so a later run replaces the earlier result.
+
+### Assignment 3: Pound Hill analysis
+
+- The conversion of blank counts to zero is justified by this dataset's metadata and should not be assumed appropriate for other datasets.
+- Plot 12 in the May treatment, Block d, contains Q1, Q2 and Q4 only. Its mean is calculated from these three recorded quadrats. Q3 is not added as a zero-valued quadrat; the supplied files do not explain why it was not recorded.
+- The figure describes differences and variation among plots. It does not by itself establish a causal effect of cultivation timing.
+
 ## AI assistance
 
 For Assignment 1, ChatGPT was used during 1–9 October 2026 for explanations, error interpretation, code review, small-test suggestions and documentation help for the three assessed tasks. Adopted suggestions were checked against course material and through terminal tests, output inspection and file comparisons.
@@ -371,3 +489,6 @@ understand errors, suggest small test cases, and help organise and clarify
 the README documentation. I checked the guidance against
 the course materials and metadata, traced examples by hand, and ran my tests
 and inspected the outputs.
+
+For Assignment 3, I used ChatGPT during 19–23 October 2026 for explanations of R syntax and task requirements, help understanding errors, hints when stuck, suggestions for small checks, and README documentation help.
+I checked adopted suggestions against the MQB materials and metadata, inspected intermediate tables and the figure, and independently ran the scripts, boundary checks and repeated-run comparisons.
