@@ -33,9 +33,9 @@ if(!all(required_columns %in% names(trees))) {
     stop("Input file does not have all three required columns: Species, Distance.m and Angle.degrees.")
 }
 
-# Warning if there are more than 3 columns but accept the file
-if(ncol(trees)>3) {
-    warning("There are more than 3 columns in the data file! Processing will continue.")
+# Stop if the input contains extra columns.
+if (ncol(trees) != 3) {
+    stop("Input must contain exactly three columns: Species, Distance.m and Angle.degrees.")
 }
 
 # Check for numeric finite Distance.m and Angle.degrees
