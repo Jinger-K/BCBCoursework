@@ -173,8 +173,7 @@ ggsave(
     height = 5
 )
 
-# May cultivation shows the highest typical richness.
-# Richness varies within all three treatments, and the values overlap between treatments.
+# May cultivation shows the highest typical richness, and richness varies within all three treatments, and the values overlap between treatments.
 # The figure alone does not establish causation.
 # To assess whether cultivation timing caused these differences, we would
 # need to know treatments were randomly allocated or not,
