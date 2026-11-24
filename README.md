@@ -85,8 +85,9 @@ Install missing packages from an R session:
 
 ```r
 install.packages(c("reshape2", "dplyr", "ggplot2"))
+```
 
-## Data
+##  Data
 
 FASTA and temperature files were supplied with the [MulQuaBio course materials](https://mulquabio.github.io/MQB/) and are kept unchanged.
 
@@ -105,15 +106,31 @@ The metadata specifies that blank species counts represent observed absences, wh
 
 ## Usage
 
-For the Assignment 1 commands below, start from the project root and enter `code/`:
+### unixPrac1.txt
+
+This file contains five numbered UNIX commands with explanations for
+inspecting the supplied FASTA files.
+
+From the repository root, enter `code/`:
 
 ```bash
 cd code
 ```
 
-### unixPrac1.txt
+Run each numbered command in `unixPrac1.txt` separately in the terminal.
+The commands read the three supplied files through `../data/fasta/`.
+Do not run the answer file as a shell script.
 
-Run each numbered command separately in the terminal. The answers count FASTA lines, display sequence data, calculate sequence length, count `ATGC` occurrences and calculate `(A+T)/(G+C)`.
+The commands count newline characters, display the E. coli sequence
+without its header, calculate sequence length, count `ATGC` occurrences,
+and calculate `(A+T)/(G+C)`. Results are printed to the terminal;
+no output files are created.
+
+After completing the FASTA commands, return to the repository root:
+
+```bash
+cd ..
+```
 
 ### tabtocsv.sh
 
@@ -402,6 +419,25 @@ The figure shows one mean quadrat richness value per plot, with colours identify
 
 ### Assignment 1
 
+#### FASTA command checks
+
+The five commands were rerun from `code/` on 24 November 2026.
+
+| Question | Observed result |
+|---|---|
+| 1 | Newline counts: 27 for `407228326.fasta`, 127 for `407228412.fasta`, and 78104 for `e_coli.fasta`; total 78258. |
+| 2 | Sequence output was inspected and confirmed to exclude the header. |
+| 3 | Sequence length: 4686137 positions. |
+| 4 | `ATGC` occurrences: 21968. |
+| 5 | `(A+T)/(G+C)`: 0.96922822848944879586. |
+
+The two numbered FASTA files lack a final newline, so their newline
+counts are one lower than their displayed line counts. The decimal
+result printed by `bc` omits the leading zero; this does not change
+its value.
+
+#### Delimiter converter checks
+
 Check syntax from `code/`:
 
 ```bash
@@ -456,6 +492,16 @@ successfully.
 ### Assignment 1
 - FASTA commands assume the supplied single-record files and uppercase sequence letters. `wc -l` counts newlines; the two numbered FASTA files lack a final newline.
 - Ambiguous bases are included in sequence length but excluded from the AT/GC ratio.
+- Questions 3 and 4 use `xargs printf '%s'` to join the supplied
+  sequence-only lines. This is suitable for these inputs, but is not
+  a general text-preserving method because `xargs` interprets
+  whitespace, quotes and backslashes. For the supplied ASCII sequence
+  symbols, the resulting byte count equals the number of sequence
+  positions.
+- Ambiguous nucleotide symbols are retained during motif searching.
+  The motif `ATGC` cannot overlap with itself, so non-overlapping
+  matching counts all its occurrences. The AT/GC ratio is undefined
+  if the G+C count is zero; the supplied sequence has a nonzero count.
 - The converters replace characters rather than fully parsing CSV/TSV. Quoted delimiters and spaces within fields may produce ambiguous output.
 - Input and output must be independent files; links between them are not checked. Existing output is overwritten.
 

@@ -1,28 +1,24 @@
 #1
 wc -l ../data/fasta/407228326.fasta ../data/fasta/407228412.fasta ../data/fasta/e_coli.fasta
 
-#This command is used to count newline characters in FASTA files. The count for the two numbered files is one lower than the actual number of lines displayed, as they do not end with newline.
+# This command is used to count newline characters in FASTA files. The count for the two numbered files is one lower than the number of lines displayed in a text editor, as they do not end with newline.
 
 #2
 tail -n +2 ../data/fasta/e_coli.fasta
 
-#This command displays all lines from the second line of e_coli.fasta. The header is excluded because it contains descriptive information rather than sequence data. In "tail -n +2", "tail" prints the final part of a file, "-n" specifies the output in terms of lines, and "+2" means starting from the second line (while "tail -n 2" prints only the last two lines).
+# This command displays all lines from the second line of e_coli.fasta. The header is excluded because it contains descriptive information rather than sequence data. In "tail -n +2", "tail" prints the final part of a file, "-n" specifies the output in terms of lines, and "+2" means starting from the second line.
 
 #3
-#tail -n +2 ../data/fasta/e_coli.fasta | grep -o '[A-Z]' | wc -l
-#or
 tail -n +2 ../data/fasta/e_coli.fasta | xargs printf '%s' | wc -c
 
-#These commands can both read the sequence lines without the header. The first one then finds uppercase letters, excluding newline characters, while the second one joins the sequence lines without newline characters. Finally they count to obtain the sequence length, and they have the same result.
+# This command excludes the header, joins the sequence lines without adding spaces or newlines, and counts the resulting bytes. The supplied sequence uses ASCII symbols, so each byte represents one sequence position, including ambiguous nucleotide symbols.
 
 #4
 tail -n +2 ../data/fasta/e_coli.fasta | xargs printf '%s' | grep -o 'ATGC' | wc -l
 
-#This command reads all the sequence lines, joins them without newline characters, then finds each occurrence of "ATGC", prints it on a separate line, and counts the lines.
+# This command excludes the header and joins the sequence lines so that motifs spanning line breaks can be found. "grep -o" prints each ATGC match on a separate line, and "wc -l" counts those matches rather than the number of input lines containing the motifs.
 
 #5
 echo "$(tail -n +2 ../data/fasta/e_coli.fasta | grep -o '[AT]' | wc -l) / $(tail -n +2 ../data/fasta/e_coli.fasta | grep -o '[CG]' | wc -l)" | bc -l
 
-# This command separately counts the total number of A and T and the total number of C and G without ambiguous positions. Then calculate AT/GC ratio, allowing the result to include decimal places. The supplied sequence has a nonzero GC count.
-
-
+# This command separately counts the total number of A and T and the total number of C and G without ambiguous positions. The counts are divided using "bc -l" to calculate (A+T)/(C+G) with decimal precision, rather than using integer division. The supplied sequence has a nonzero GC count. If that count were zero, the ratio would be undefined.
