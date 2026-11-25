@@ -13,7 +13,6 @@
 TreeHeight <- function(degrees, distance){
     radians <- degrees * pi /180
     height <- distance * tan(radians)
-    print(paste("Tree height is;", height))
 
     return (height)
 }
@@ -27,7 +26,7 @@ if(length(input_path) != 1) {
     stop("There must be one input path.")
 }
 
-# Check that the input file exists and is readable
+# Reject missing and non-finite measurements before checking their ranges.
 if(!file.exists(input_path[1])) {
     stop("File doesn't exist.")
 }        
@@ -84,6 +83,7 @@ if(!all(trees$Angle.degrees > 0 & trees$Angle.degrees < 90)) {
 # Make sure the columns are organised in the required order
 trees <- trees[, required_columns]
 
+# Debugging: Uncomment the following line to inspect the data
 # browser()
 
 # Calculate the heights

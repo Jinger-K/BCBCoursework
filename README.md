@@ -705,6 +705,54 @@ tolerance of `1e-10`.
 Invalid-input and directory-creation checks used isolated temporary
 projects without modifying the supplied input file.
 
+#### get_TreeHeight.R: changes after formative feedback
+
+I retained the existing calculation and input-validation logic.
+Following formative feedback, I checked the generalised route separately
+and documented an independent height comparison against both programs'
+outputs.
+
+#### get_TreeHeight.R: verification
+
+The following command completed with exit status `0` from the project root:
+
+```bash
+Rscript code/get_TreeHeight.R data/trees.csv
+```
+
+The output contained 120 records with the required four columns.
+All original columns retained their input values and row order.
+The fixed and generalised output tables also matched.
+
+For the first record, Populus tremula, the independent calculation
+documented above gave approximately 27.8021161438536 m.
+Both `results/TreeHts.csv` and `results/trees_treeheights.csv` matched
+this value within an absolute tolerance of `1e-10`.
+
+| Check | Observed result |
+| --- | --- |
+| Repeated run | Returned `0`; `diff` confirmed identical output and unchanged input during the check. |
+| Spaced input path and output naming | `data/tree measurements.csv` produced `results/tree measurements_treeheights.csv`, matching the verified output. |
+| Missing results directory | The script created `results/` automatically in a temporary project. |
+| Missing or extra arguments | Returned `1` with an argument-count error. |
+| Missing file, directory input or unreadable file | Returned `1` with an appropriate error; these checks created no results directory. |
+| Distance 0 or 101; angle 0 or 90 | Returned `1` with range errors and created no output. |
+| Text or missing values in either measurement column | Returned `1` with numeric-type errors and created no output. |
+| Infinite distance or NaN angle | Returned `1` with finite-value errors and created no output. |
+| Missing or extra column | Returned `1` with a column-validation error and created no output. |
+| Distance 100 m and angle 45 degrees | Returned `0` and produced a height of 100 m. |
+
+Invalid-input checks used isolated temporary projects.
+
+For interactive debugging, I temporarily placed `browser()` immediately
+before the height calculation, started R using
+`R --vanilla --args data/trees.csv`, and sourced the script.
+I inspected the first record and calculated its expected height.
+The subsequent height comparison passed with a tolerance of `1e-10`.
+
+I removed the temporary breakpoint and reran the normal command.
+It completed without an interactive pause and returned exit status `0`.
+
 
 ## Limitations
 
