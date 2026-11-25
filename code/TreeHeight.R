@@ -10,10 +10,9 @@
 # The heights of the tree, same units as "distance"
 
 # Define the function to calculate tree heights
-TreeHeight <- function(degrees, distance){
+TreeHeight <- function(degrees, distance) {
     radians <- degrees * pi /180
     height <- distance * tan(radians)
-    print(paste("Tree height is;", height))
 
     return (height)
 }
@@ -46,7 +45,7 @@ if(!is.numeric(trees$Angle.degrees)) {
     stop("Angle.degrees must be numeric.")
 }
 
-# Check if the values are finite in case it fails if()
+# Reject missing and non-finite measurements before checking their ranges.
 if(!all(is.finite(trees$Distance.m))) {
     stop("Distance.m must contain only finite values.")
 }

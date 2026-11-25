@@ -648,14 +648,62 @@ cloned Git repository, following the README commands exactly, is pending.
 All analyses were run independently from the project root and rerun
 successfully.
 
-- Tree heights: outputs had the required four columns and 120 records
-  in input order. The first record was checked against the formula,
-  and a separate 8 m, 45-degree measurement returned 8 m. Reruns produced
-  identical CSV files. Command-line error cases and numeric boundaries
-  were checked, and interactive debugging with `browser()` was completed.
 - Pound Hill: the richness CSV contained 12 plots, each appearing once,
   with four plots per treatment. The saved PDF was inspected, and rerunning
   produced an identical CSV.
+
+#### TreeHeight.R: changes after formative feedback
+
+I retained the existing tree-height calculation and input validation.
+Following formative feedback, I documented an independent calculation
+using a real input record and checked the fixed-input script separately
+with normal, boundary and invalid inputs.
+
+#### TreeHeight.R: verification
+
+Both commands below returned exit status `0` when run from the project root:
+
+```bash
+Rscript code/TreeHeight.R
+Rscript -e 'source("code/TreeHeight.R")'
+```
+
+The output contained 120 records and exactly four columns:
+`Species`, `Distance.m`, `Angle.degrees` and `height_m`.
+A comparison confirmed that all three original columns retained their
+input values and row order.
+
+For an independent check, I used the first input record, Populus tremula:
+
+- Horizontal distance: 31.6658337740228 m.
+- Angle measured from horizontal: 41.2826361937914 degrees.
+- Degrees were converted to radians by multiplying by `pi / 180`.
+
+Without calling `TreeHeight()`, I calculated:
+
+```text
+height = 31.6658337740228 × tan(41.2826361937914 × pi / 180)
+       ≈ 27.8021161438536 m
+```
+
+This matched the first height in `results/TreeHts.csv` within an absolute
+tolerance of `1e-10`.
+
+| Check | Observed result |
+| --- | --- |
+| Repeated run | Returned `0`; `diff` confirmed an identical output. |
+| Input protection | `diff` confirmed that the input remained unchanged during the repeated-run check. |
+| Missing results directory | A temporary project created `results/` automatically and produced an identical CSV. |
+| Distance 0 or 101 | Returned `1` with a distance-range error and created no output. |
+| Angle 0 or 90 | Returned `1` with an angle-range error and created no output. |
+| Text in either measurement column | Returned `1` with a numeric-type error and created no output. |
+| Infinite distance or NaN angle | Returned `1` with a finite-value error and created no output. |
+| Missing distance or angle | Returned `1` with a numeric-type error and created no output. |
+| Missing or extra column | Returned `1` with a column-validation error and created no output. |
+| Distance 100 m and angle 45 degrees | Returned `0` and produced a height of 100 m. |
+
+Invalid-input and directory-creation checks used isolated temporary
+projects without modifying the supplied input file.
 
 
 ## Limitations
