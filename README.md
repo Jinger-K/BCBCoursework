@@ -134,11 +134,28 @@ cd ..
 
 ### tabtocsv.sh
 
+Run from the repository root:
+
 ```bash
-bash tabtocsv.sh ../data/tab-example.tsv
+bash code/tabtocsv.sh data/tab-example.tsv
 ```
 
-Output: `results/tab-example.tsv.csv`.
+The script accepts exactly one readable tab-delimited input file.
+Quote input paths containing spaces.
+
+It replaces tabs with commas and writes
+`results/<input-filename>.csv`. For the example above, the output is
+`results/tab-example.tsv.csv`.
+
+The script creates `results/` if needed, preserves empty fields,
+leaves the input unchanged and overwrites its previous output on reruns.
+
+Errors are written to standard error without reporting success.
+Exit status `0` indicates success, `1` indicates a file or processing
+error, and `2` indicates an incorrect argument count.
+
+This script requires Bash and the standard command-line tools
+`basename`, `mkdir` and `tr`.
 
 ### csvtospace.sh
 
@@ -419,6 +436,21 @@ The figure shows one mean quadrat richness value per plot, with colours identify
 
 ### Assignment 1
 
+#### Changes after formative feedback: FASTA commands
+
+The formative feedback confirmed that all five FASTA answers were
+correct, so I retained the commands, including `xargs printf '%s'`
+for joining the supplied sequence lines.
+
+I clarified the explanations in `unixPrac1.txt`, covering newline
+counts, sequence-position counting, motifs spanning line breaks,
+and decimal division for the AT/GC ratio. I also expanded the README
+instructions and documented the assumptions and limitations of
+these methods.
+
+All five commands from `code/` are reruned.
+The observed results and checks are recorded in the following section.
+
 #### FASTA command checks
 
 The five commands were rerun from `code/` on 24 November 2026.
@@ -438,20 +470,63 @@ its value.
 
 #### Delimiter converter checks
 
-Check syntax from `code/`:
+##### tabtocsv.sh: changes after formative feedback
+
+The feedback identified that the script assumed a `code/` starting
+directory. I changed both the output path and the directory-creation
+command from `../results` to `results`, allowing the script to run
+from the repository root. I updated the README invocation accordingly.
+
+I retained the existing argument validation, quoted paths, empty-field
+preservation and overwrite behaviour.
+
+##### tabtocsv.sh: verification
+
+The revised script was checked on 25 November 2026 from the
+repository root.
 
 ```bash
-bash -n tabtocsv.sh
-bash -n csvtospace.sh
+bash -n code/tabtocsv.sh
+bash code/tabtocsv.sh data/tab-example.tsv
 ```
 
-After each test run, use `echo "$?"` to inspect the exit status and inspect the output itself.
+Both commands returned status `0`. The generated file,
+`results/tab-example.tsv.csv`, contained:
 
-Tests passed for normal inputs, empty fields, paths containing spaces, repeated runs, missing arguments and nonexistent files. File comparisons with `diff` confirmed unchanged inputs and identical rerun outputs.
+```text
+species,count,height
+oak,,12
+pine,7,16
+```
 
-All four temperature files converted successfully. Their output line counts were `1825`, `1825`, `2190` and `1825`.
+| Check | Observed result |
+|---|---|
+| Repeated run | Returned status `0`; `diff` confirmed identical output with no appended rows. |
+| Input protection | `diff` confirmed that the input remained unchanged after the rerun. |
+| Input path containing spaces | Returned status `0`; output matched the normal-path result. |
+| Missing argument | Returned status `2` with an error message. |
+| Extra argument | Returned status `2` with an error message. |
+| Nonexistent input | Returned status `1` with an error message. |
+| Directory supplied as input | Returned status `1` with an error message. |
+| Unreadable input | Returned status `1` with an error message. |
+| Missing results directory | In a separate temporary directory, confirmed that `results/` was absent before execution; the script created it, returned status `0` and generated the expected CSV. |
 
-Normal-input checks were also completed successfully from a fresh clone on 9 October 2026.
+Exit statuses were inspected immediately after the relevant commands.
+All rejected input cases reported an error without displaying `Done!`.
+
+Verification of the revised version in a fresh Git checkout is pending.
+The temporary-directory check above tested directory creation, but was
+not a Git checkout test.
+
+##### csvtospace.sh: previous checks
+
+Previous checks recorded successful conversion of all four supplied
+temperature files, with output line counts of `1825`, `1825`, `2190`
+and `1825`. Earlier normal-input checks were recorded from a fresh
+clone on 9 October 2026.
+
+These are historical checks. Review and verification of the current
+script after formative feedback are pending.
 
 ### Assignment 2
 
