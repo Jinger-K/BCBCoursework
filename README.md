@@ -159,15 +159,31 @@ This script requires Bash and the standard command-line tools
 
 ### csvtospace.sh
 
+Run from the repository root:
+
 ```bash
-bash csvtospace.sh ../data/temperatures/1800.csv
+bash code/csvtospace.sh data/temperatures/1800.csv
 ```
 
-Output: `results/1800.csv.txt`. Repeat with `1801.csv`, `1802.csv` and `1803.csv`.
+Repeat with `1801.csv`, `1802.csv` and `1803.csv`.
 
-Both scripts accept one readable input file. Quote paths containing spaces. They create `results/` if needed, preserve empty fields and replace previous output on reruns.
+The script accepts exactly one readable CSV input path.
+Quote paths containing spaces.
 
-Errors go to standard error. Exit status `0` means success, `1` indicates a file or processing error, and `2` indicates an incorrect argument count.
+It replaces commas with spaces and writes
+`results/<input-filename>.txt`. For the example above, the output is
+`results/1800.csv.txt`.
+
+The script creates `results/` if needed, preserves empty fields as
+repeated spaces, leaves the input unchanged and overwrites previous
+output on reruns.
+
+Errors are written to standard error without reporting success.
+Exit status `0` indicates success, `1` indicates a file or processing
+error, and `2` indicates an incorrect argument count.
+
+This script requires Bash and the standard command-line tools
+`basename`, `mkdir` and `tr`.
 
 ### Assignment 2: Tree-survey validation
 
@@ -518,15 +534,41 @@ Verification of the revised version in a fresh Git checkout is pending.
 The temporary-directory check above tested directory creation, but was
 not a Git checkout test.
 
-##### csvtospace.sh: previous checks
+##### csvtospace.sh: changes after formative feedback
 
-Previous checks recorded successful conversion of all four supplied
-temperature files, with output line counts of `1825`, `1825`, `2190`
-and `1825`. Earlier normal-input checks were recorded from a fresh
-clone on 9 October 2026.
+The feedback identified that the script assumed a `code/` starting
+directory. I changed both the output path and directory-creation
+command from `../results` to `results`, allowing execution from the
+repository root. I updated the README invocation accordingly.
 
-These are historical checks. Review and verification of the current
-script after formative feedback are pending.
+I retained the existing argument validation, quoted paths,
+empty-field preservation and overwrite behaviour.
+
+##### csvtospace.sh: verification
+
+The revised script was checked on 25 November 2026 from the
+repository root.
+
+```bash
+bash -n code/csvtospace.sh
+bash code/csvtospace.sh data/temperatures/1800.csv
+```
+
+Both commands returned status `0`.
+
+| Check | Observed result |
+|---|---|
+| Four supplied temperature files | All conversions returned status `0`; input and output line counts matched at `1825`, `1825`, `2190` and `1825`, respectively. |
+| Repeated runs | All returned status `0`; `diff` confirmed identical outputs without appended rows. |
+| Input protection | File comparisons confirmed that all four supplied inputs remained unchanged during these checks. |
+| Empty field and spaced input path | A constructed CSV named `field notes.csv` converted successfully; `diff` matched an independently written expected output, including two spaces for the empty field in `oak,,12`. |
+| Missing or extra arguments | Returned status `2` with error messages. |
+| Nonexistent file, directory input and unreadable file | Returned status `1` with error messages. |
+| Missing results directory | In a separate temporary directory, confirmed that `results/` was absent; the script created it, returned status `0` and produced output matching the expected file. |
+
+Exit statuses were inspected immediately after the relevant commands.
+Rejected inputs produced error messages without displaying `Done!`.
+
 
 ### Assignment 2
 

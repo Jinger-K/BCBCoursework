@@ -4,6 +4,7 @@
 # Desc: replace commas with spaces
 # Arguments : 1-> csv file
 # Date: Oct 2026
+# Run from the repository root; write results to results/<input-filename>.txt.
 
 # Accept exactly one readable csv input file and support paths containing spaces
 if [[ $# -ne 1 ]]; then
@@ -13,14 +14,14 @@ fi
 
 # Check file type and readability
 if [[ -f "$1" && -r "$1" ]]; then
-    output_file="../results/$(basename "$1").txt"
+    output_file="results/$(basename "$1").txt"
 else
     printf 'Error: not a readable file: %s\n' "$1" >&2
     exit 1
 fi
 
 # Create results directory if needed
-mkdir -p ../results
+mkdir -p results
 
 if [[ $? -ne 0 ]]; then
     printf 'Error: cannot create the results directory\n' >&2
