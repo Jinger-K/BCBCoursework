@@ -205,6 +205,18 @@ The program reads `data/silwood_trees_raw.csv` and creates or replaces:
 The program creates `results/` when needed and leaves the raw survey unchanged.
 The generated files are excluded from Git.
 
+The validation rules and exact output formats are defined in
+`data/silwood_trees_metadata.md`.
+
+The workflow is:
+`load_records()` → `process_records()` → `summarise_oaks()` → `write_csv()`.
+
+`process_records()` calls `validate_record()` for each source record
+and separates accepted records from rejected-row reports.
+Only the returned cleaned records are passed to `summarise_oaks()`;
+rejected records do not contribute to the oak counts.
+`main()` connects these stages and writes the three output tables.
+
 The algorithms below describe the three implemented functions.
 
 ### validate_record algorithm
@@ -220,7 +232,7 @@ Returns:
 
 This function does not modify the input record or the accepted identifiers.
 The starter's `source_row` parameter is retained. The current validation
-logic does not use it; the row number will be used during batch processing
+logic does not use it; `process_records()` uses the row number
 to build issue reports.
 
 ```text
@@ -464,7 +476,7 @@ and decimal division for the AT/GC ratio. I also expanded the README
 instructions and documented the assumptions and limitations of
 these methods.
 
-All five commands from `code/` are reruned.
+All five commands were rerun from `code/`.
 The observed results and checks are recorded in the following section.
 
 #### FASTA command checks
@@ -572,22 +584,64 @@ Rejected inputs produced error messages without displaying `Done!`.
 
 ### Assignment 2
 
-Run the test script from the project root:
+#### Changes after formative feedback
+
+I retained the existing loading, validation, processing, summarising
+and writing stages. I clarified the cleaner's documentation of the
+retained `source_row` parameter, CSV row numbering, the rule that
+rejected records do not reserve identifiers, and the need to reject
+non-finite measurements after numeric conversion.
+
+The existing tests were already numbered and labelled by behaviour.
+I reviewed their coverage against the metadata and retained that
+organisation.
+
+I extended Test 10 to pass the cleaned records returned by
+`process_records()` directly to `summarise_oaks()`. The four constructed
+input records include two accepted oak records and two rejected oak
+records. The resulting summary must contain exactly two `robur`
+records, demonstrating that rejected records do not contribute.
+
+I also added checks that processing leaves the input records unchanged
+and that an empty input returns two empty lists.
+
+#### Verification
+
+Run the tests and cleaner from the repository root:
 
 ```bash
 python3 code/test_silwood_trees.py
+python3 code/clean_silwood_trees.py
 ```
 
-The script uses constructed records and `assert` checks without changing the survey.
-All 12 test sections passed. They cover text cleaning, missing and unrecognised
-values, taxon pairs, invalid and out-of-range measurements, duplicate identifiers,
-multiple rejection reasons, record processing, and oak summaries.
+All 12 labelled test sections passed, including
+the additional assertions in Test 10. The test command and cleaner
+both returned exit status `0`.
 
-One useful test checks that `nan` and `inf` are rejected as invalid measurements. This detects a validation error where successful conversion to a number is incorrectly treated as sufficient for acceptance.
+The tests cover text cleaning, missing and unrecognised values,
+permitted and invalid taxon pairs, non-numeric and non-finite
+measurements, numeric boundaries, duplicate identifiers, ordered
+rejection reasons, record processing and oak summaries.
 
-Repeated-run consistency and the unchanged raw input were checked manually.
-Import behaviour, automatic creation of `results/`, and output contents were
-also checked separately from the function tests.
+One useful check rejects `nan`, `inf` and `-inf`: successful conversion
+with `float()` does not establish that a measurement is valid.
+The processing-to-summary check would detect rejected oak records
+being included in the summary.
+
+| Check | Observed result |
+|---|---|
+| Supplied survey | 36 input records produced 24 accepted records and 12 rejected-row reports. |
+| Cleaned table | Accepted identifiers were `ST001`–`ST024` in sorted order; text was canonicalised and numeric values were preserved. |
+| Issue table | Source-row numbers, rejection reasons and reason order matched the metadata. |
+| Oak summary | `petraea` and `robur` each had count `4`, in species order. |
+| Repeated run | All three generated files were identical to their first-run copies according to `diff`. |
+| Input protection | The raw CSV and metadata matched copies taken before running the cleaner. |
+| Import behaviour | In a separate temporary copy without input data, importing the module returned status `0`, printed no report and created no `results/` directory. |
+| Missing results directory | After supplying the raw CSV to that temporary copy, the cleaner created `results/` and returned status `0`. |
+| Independent temporary copy | All three generated tables matched the working-copy outputs according to `diff`. |
+
+These checks used the current local files. Verification in a newly
+cloned Git repository, following the README commands exactly, is pending.
 
 ### Assignment 3
 
@@ -626,7 +680,7 @@ successfully.
 
 - Source-row numbering assumes one record per line, with no blank lines between records.
 - Each input record must contain all six fields as strings. Empty cells are handled, but structurally missing fields that CSV reading represents as `None` are not supported.
-- The cleaner supports only the column layout, locations and taxon pairs specifies in the supplied metadata.
+- The cleaner supports only the column layout, locations and taxon pairs specified in the supplied metadata.
 
 The supplied survey was checked and satisfies these assumptions, so these limitations
 do not affect this dataset.

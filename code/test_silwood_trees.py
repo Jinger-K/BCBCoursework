@@ -296,7 +296,13 @@ for record_id, location, distance in processing_cases:
 
     test_rows.append(test_record)
 
+# Keep independent copies to detect changes to input fields.
+original_test_rows = [row.copy() for row in test_rows]
+
 cleaned_records, error_log = process_records(test_rows)
+
+assert test_rows == original_test_rows
+assert process_records([]) == ([], [])
 
 expected_cleaned_records = [
     {
@@ -332,6 +338,14 @@ expected_error_log = [
 
 assert cleaned_records == expected_cleaned_records
 assert error_log == expected_error_log
+
+# Summarise the accepted records returned by process_records.
+# Rejected oak records must not contribute to the count.
+processed_oak_summary = summarise_oaks(cleaned_records)
+
+assert processed_oak_summary == [
+    {"species": "robur", "count": "2"},
+]
 
 print("Record-processing tests passed.")
 

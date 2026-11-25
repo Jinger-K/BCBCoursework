@@ -41,7 +41,11 @@ def validate_record(
     source_row: int,
     accepted_ids: set[str],
 ) -> tuple[dict[str, str] | None, list[str]]:
-    """Return a cleaned record or its ordered rejection reasons."""
+    """Return a cleaned record or its ordered rejection reasons.
+
+    Do not modify row or accepted_ids. Retain source_row for the
+    starter interface; process_records uses it in the issue report.
+    """
 
     reasons = [] # Create an empty list to store errors
 
@@ -139,6 +143,7 @@ def validate_record(
         except ValueError:   # In case invalid characters interrupt the process
             reasons.append("invalid distance_m")
         else:
+            # float() accepts nan and inf, but the metadata rejects them.
             if not math.isfinite(distance):
                 reasons.append("invalid distance_m")
             elif distance <= 0 or distance > 100:
@@ -185,15 +190,18 @@ def process_records(
     error_log = []
     accepted_ids = set()
 
-    source_row = 2 # Initialise source row
+    # The CSV header is source row 1.
+    source_row = 2
 
     for row in rows:
         cleaned_record, reasons = validate_record(row, source_row, accepted_ids)
         
         if cleaned_record is not None:
             cleaned_records.append(cleaned_record)
+            # Rejected rows must not reserve an identifier.
             accepted_ids.add(cleaned_record["record_id"])
         else:
+            # Create a string of all reasons for the error
             reasons_temp = ""
 
             for reason in reasons:
