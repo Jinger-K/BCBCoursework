@@ -518,6 +518,24 @@ Requires Bash. No input files or command-line arguments are needed.
 The script prints a demonstration message with surrounding blank lines
 to the terminal and creates no output files.
 
+#### CheckLabel.sh
+
+Demonstrates conditional control flow and command-line argument validation.
+Requires Bash and exactly one argument: `oak` or `pine`.
+No input files are needed.
+
+Run from the repository root:
+
+```bash
+bash code/CheckLabel.sh oak
+```
+
+A valid label is printed to standard output. An incorrect argument count
+produces a usage message on standard error and exit status `2`.
+An unknown label produces an error message on standard error and
+exit status `1`. Successful execution returns `0`.
+No output files are created.
+
 
 ## Testing
 
@@ -906,6 +924,22 @@ execution using `./code/boilerplate.sh` were checked from the
 repository root, after granting executable permission with `chmod u+x`.
 Both printed `This is a shell script!` with surrounding blank lines,
 as expected.
+
+#### CheckLabel.sh
+
+The following checks were run from the
+repository root. Exit statuses were inspected immediately after
+each invocation using `echo "$?"`.
+
+| Arguments | Observed result | Exit status |
+| --- | --- | --- |
+| `oak` | Printed the selected label. | `0` |
+| None | Printed the usage message. | `2` |
+| `birch` | Reported an unknown label. | `1` |
+| `oak pine` | Printed the usage message. | `2` |
+
+All four checks matched the expected behaviour.
+
 
 ## Limitations
 
