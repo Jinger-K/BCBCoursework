@@ -11,7 +11,7 @@ Assignment 1 covers UNIX commands, FASTA analysis and delimiter conversion.
 Assignment 2 validates synthetic tree-survey records and produces cleaned data, issue reports and oak counts.
 Assignment 3 calculates tree heights using fixed-input and command-line R scripts, and compares plant species richness and abundance among cultivation treatments at Pound Hill.
 
-Additional Python and R classroom exercises are kept in `code/`.
+Additional Shell, Python and R classroom exercises are kept in `code/`.
 
 ## Project structure
 
@@ -459,7 +459,10 @@ The script also calculates total abundance within each quadrat and its mean with
 
 The figure shows one mean quadrat richness value per plot, with colours identifying blocks. May has the highest typical richness, while March and October are lower. Plot values vary within treatments and overlap between treatments; the figure alone does not establish causation.
 
-### variables.sh
+
+### Additional classroom exercises: Shell
+
+#### variables.sh
 
 Demonstrates Bash positional parameters, variable assignment, interactive
 input and integer addition. Requires Bash and the external command `expr`.
@@ -477,6 +480,21 @@ It does not read or create files.
 
 This teaching example assumes valid integer input; it does not validate
 arbitrary input.
+
+#### MyExampleScript.sh
+
+Demonstrates shell variable assignment and expansion by printing
+a greeting using `$USER`.
+
+Run from the repository root:
+
+```bash
+bash code/MyExampleScript.sh
+```
+
+Requires Bash. No input files or command-line arguments are needed.
+The script reads `$USER` from the environment and prints the greeting
+to the terminal. No output files are created.
 
 
 ## Testing
@@ -842,7 +860,9 @@ and avoids inferring causation from the figure alone.
 
 Invalid-input checks modified only temporary copies of the data.
 
-### variables.sh
+### Additional classroom exercises: Shell
+
+#### variables.sh
 
 - `bash -n code/variables.sh` returned status `0`.
 - Runs with no arguments and with `1 "two words"` showed the expected
@@ -851,6 +871,11 @@ Invalid-input checks modified only temporary copies of the data.
 - Integer inputs `3 5` and `-3 0` produced `8` and `-3`.
 - Bash arithmetic expansion was temporarily substituted for `expr`
   and also produced `8` for `3 5`; the final script retains `expr`.
+
+#### MyExampleScript.sh
+
+The script was run from the repository root.
+It printed `Hello` followed by the value of `$USER`, as expected.
 
 
 ## Limitations
