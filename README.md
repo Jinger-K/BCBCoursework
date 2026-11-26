@@ -86,6 +86,12 @@ Install missing packages from an R session:
 ```r
 install.packages(c("reshape2", "dplyr", "ggplot2"))
 ```
+The additional `tiff2_png.sh` classroom exercise requires ImageMagick.
+The current script uses `convert`; environments providing only `magick`
+require the command in the script to be changed accordingly.
+Neither command was found on the machine used for this review,
+so image conversion was not tested.
+
 
 ##  Data
 
@@ -580,6 +586,52 @@ Exit status `0` indicates success, `2` indicates an incorrect argument
 count, and `1` indicates a validation or write failure.
 A failure while displaying the output returns the final `cat` command's
 nonzero status. Errors are reported on standard error.
+
+#### tiff2_png.sh
+
+Demonstrates a shell loop that converts lowercase `.tif` files to PNG.
+Requires Bash, `basename` and ImageMagick's `convert` command.
+It takes no command-line arguments.
+
+The script processes the current working directory and writes PNG files
+there using the same filename stems. Existing PNG outputs may be overwritten.
+
+From the repository root, save the script path and prepare a test directory:
+
+```bash
+project_root=$PWD
+script_path="$project_root/code/tiff2_png.sh"
+mkdir -p sandbox/tiff_checks
+cd sandbox/tiff_checks
+```
+
+Copy expendable TIFF images into this directory. Use lowercase `.tif`
+extensions, filenames not beginning with `-`, and no existing PNG outputs.
+
+Check the converter and preview input/output names before running:
+
+```bash
+command -v convert
+
+for filename in *.tif
+do
+    printf 'Input: <%s> Output: <%s>\n' \
+        "$filename" "$(basename "$filename" .tif).png"
+done
+```
+
+If `convert` is unavailable or the preview shows literal `*.tif`,
+do not run the conversion. Otherwise, run:
+
+```bash
+bash "$script_path"
+```
+
+Return to the repository root afterwards:
+
+```bash
+cd "$project_root"
+```
 
 
 ## Testing
@@ -1205,6 +1257,19 @@ nothing and returned `0`.
 These checks do not verify detection of different paths referring
 to the same file; see Limitations.
 
+#### tiff2_png.sh
+
+During review, the missing `done` was added to close the loop.
+Comments explain the working directory and output naming.
+
+Syntax was checked from the repository root using
+`bash -n code/tiff2_png.sh`; no syntax errors were reported.
+
+Neither `command -v magick` nor `command -v convert` returned a path.
+Actual TIFF-to-PNG conversion and output-image inspection remain
+unverified because the required converter was unavailable.
+
+
 
 ## Limitations
 
@@ -1252,6 +1317,12 @@ do not affect this dataset.
   The caller must ensure the output is a separate file.
 - Existing output is overwritten. A processing failure may leave a
   partial output; the script does not restore the previous output.
+- `tiff2_png.sh` handles only lowercase `.tif` matches in the current
+  directory. It does not explicitly handle no matching files,
+  option-like filenames, output collisions or conversion failures.
+  Existing PNG outputs may be overwritten, and the script's final
+  exit status does not establish that every conversion succeeded.
+
 
 ## AI assistance
 
