@@ -648,10 +648,6 @@ cloned Git repository, following the README commands exactly, is pending.
 All analyses were run independently from the project root and rerun
 successfully.
 
-- Pound Hill: the richness CSV contained 12 plots, each appearing once,
-  with four plots per treatment. The saved PDF was inspected, and rerunning
-  produced an identical CSV.
-
 #### TreeHeight.R: changes after formative feedback
 
 I retained the existing tree-height calculation and input validation.
@@ -752,6 +748,80 @@ The subsequent height comparison passed with a tolerance of `1e-10`.
 
 I removed the temporary breakpoint and reran the normal command.
 It completed without an interactive pause and returned exit status `0`.
+
+#### run_get_TreeHeight.sh: verification
+
+The wrapper was retained because its invocation and failure handling
+already matched the requirements. Its behaviour was checked separately
+after reviewing the R scripts.
+
+Run from the project root:
+
+```bash
+bash code/run_get_TreeHeight.sh
+```
+
+| Check | Observed result |
+| --- | --- |
+| Syntax | `bash -n code/run_get_TreeHeight.sh` returned `0`. |
+| Normal execution | The wrapper returned `0`; `diff` confirmed that its output matched the previously verified CSV. |
+| Failure propagation | In a temporary project containing both scripts but no input data, the R script reported the missing file and the wrapper returned `1`. No results directory was created. |
+
+#### pound_hill_analysis.R: changes after formative feedback
+
+I retained the quadrat-to-plot richness calculation and figure.
+Following formative feedback, I documented a check tracing one plot
+from the raw species counts through quadrat richness and the plot mean
+to the saved CSV and figure.
+
+I clarified the metadata-based reason for treating blank species counts
+as observed zeros. I also added a finite-value check while retaining
+the missing-value and negative-count checks.
+
+#### pound_hill_analysis.R: verification
+
+Run from the project root:
+
+```bash
+Rscript code/pound_hill_analysis.R
+```
+
+The analysis returned exit status `0` and identified 41 species,
+59 quadrats and 12 plots. The saved richness table contained one row
+per plot.
+
+For an independent check, I selected Plot 12 under May cultivation,
+Block d, directly from the raw wide-format data.
+
+| Recorded quadrat | Independently calculated richness |
+| --- | ---: |
+| Q1 | 9 |
+| Q2 | 8 |
+| Q4 | 10 |
+
+The mean was `(9 + 8 + 10) / 3 = 9`, matching `MeanRichness` in
+`results/pound_hill_plot_richness.csv` within a tolerance of `1e-10`.
+Q3 was not recorded and was not added as a zero-valued quadrat.
+
+The PDF was opened and inspected. The May point at richness 9,
+coloured for Block d, matched Plot 12. Axes and the block legend were
+readable, and the plotted points matched the saved table.
+
+The interpretation describes mean species richness rather than
+abundance, acknowledges overlapping observed ranges among treatments,
+and avoids inferring causation from the figure alone.
+
+| Check | Observed result |
+| --- | --- |
+| Repeated execution | Returned `0`; `diff` confirmed an identical richness CSV. |
+| Input protection | Comparisons confirmed that the data and metadata remained unchanged during the checks. |
+| PDF regeneration | The rerun produced a nonempty PDF. |
+| Missing results directory | A temporary project created both nonempty outputs and produced a richness CSV identical to the verified result. |
+| Negative count (`-1`) | Returned `1` with a negative-count error; neither output was created. |
+| Text count (`many`) | Returned `1` after conversion produced a missing value; neither output was created. |
+| Infinite count (`Inf`) | Returned `1` with a finite-value error; neither output was created. |
+
+Invalid-input checks modified only temporary copies of the data.
 
 
 ## Limitations

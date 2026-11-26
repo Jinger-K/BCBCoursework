@@ -28,7 +28,8 @@ TData <- t(as.matrix(RawData))
 TempData <- as.data.frame(TData[-1, ])
 colnames(TempData) <- TData[1, ]
 
-# Replace blank species counts with zeros
+# The metadata defines blank species counts as observed absences.
+# Convert these blanks to zero without changing the sampling labels.
 SpeciesCounts <- TempData[, -(1:4)] # The first four columns are sampling labels
 SpeciesCounts[is.na(SpeciesCounts) | SpeciesCounts == ""] <- 0
 TempData[, -(1:4)] <- SpeciesCounts
@@ -54,6 +55,11 @@ if (!is.numeric(LongData$Count)) {
 # Stop if counts contain missing values.
 if (any(is.na(LongData$Count))) {
     stop("Counts contain missing values.")
+}
+
+# Counts must be finite; missing values should already have been resolved.
+if (any(!is.finite(LongData$Count))) {
+    stop("Counts must contain only finite values.")
 }
 
 # Stop if counts contain negative values.
