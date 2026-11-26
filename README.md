@@ -715,6 +715,22 @@ such as `12`. Quote arguments containing spaces.
 No arguments are required. No input files are read and no output
 files are created.
 
+#### loops.py
+
+Demonstrates iteration over a range and a mixed-type list,
+cumulative addition, and a while loop.
+
+Requires Python 3 and no additional packages.
+Run from the repository root:
+
+```bash
+python3 code/loops.py
+```
+
+No input files or command-line arguments are needed.
+The script prints four sequences to the terminal and creates no
+output files. The examples execute at module level.
+
 
 
 
@@ -1450,6 +1466,27 @@ echo "$?"
 All runs reported `code/sysargv.py` as the script name.
 The results confirmed that arguments remain strings and quoted
 text containing spaces is passed as one argument.
+
+#### loops.py
+
+Run from the repository root:
+
+```bash
+python3 code/loops.py
+echo "$?"
+```
+
+The output was inspected in order:
+
+| Section | Observed output |
+| --- | --- |
+| Range loop | Integers `0` to `4`. |
+| List loop | `0`, `2`, `geronimo!`, `3.0`, `True`, `False`, each on a separate line. |
+| Cumulative addition | `0`, `1`, `12`, `123`, `1234`, each on a separate line. |
+| While loop | Integers `1` to `100`, then termination. |
+
+All four sequences matched the expected values and order.
+The exit status was `0`.
 
 
 
