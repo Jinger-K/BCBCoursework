@@ -678,6 +678,26 @@ Direct execution prints `This is a boilerplate`.
 Importing the module does not run `main()` automatically.
 No output files are created.
 
+#### using_name.py
+
+Demonstrates how Python assigns `__name__` during direct execution
+and import. Requires Python 3 and no additional packages.
+
+Run from the repository root:
+
+```bash
+python3 code/using_name.py
+```
+
+Direct execution prints `This module's name is: __main__`.
+Importing the module produces no message; `module_name()` then
+returns `using_name`.
+
+No input files or command-line arguments are needed.
+No output files are created.
+
+
+
 
 
 
@@ -1352,6 +1372,40 @@ exit()
 Importing the module produced no message. Explicitly calling
 `boilerplate.main()` printed `This is a boilerplate`, as expected.
 The path adjustment applies only to this Python session.
+
+#### using_name.py
+
+The shebang was corrected to `#!/usr/bin/env python3`.
+
+Direct execution from the repository root printed
+`This module's name is: __main__` and returned exit status `0`,
+inspected immediately using `echo "$?"`.
+
+Import behaviour was checked in a fresh Python session started
+from the repository root:
+
+```bash
+python3
+```
+
+At the Python prompt:
+
+```python
+import sys
+sys.path.insert(0, "code")
+import using_name
+print(using_name.module_name())
+using_name.main()
+exit()
+```
+
+Importing produced no message. Printing the return value of
+`module_name()` displayed `using_name`. Calling `main()` after
+import printed `This module's name is: using_name`.
+These results matched the expected distinction between direct
+execution and import.
+
+
 
 
 
