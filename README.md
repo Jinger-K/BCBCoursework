@@ -556,6 +556,32 @@ Exit status `0` indicates success, `2` indicates an incorrect
 argument count, and `1` indicates an invalid input or counting failure.
 Errors are reported on standard error.
 
+#### ConcatenateTwoFiles.sh
+
+Combines two readable regular files in argument order.
+Requires Bash and `cat`.
+
+Run from the repository root with two input paths and one output path:
+
+```bash
+bash code/ConcatenateTwoFiles.sh input1.txt input2.txt combined.txt
+```
+
+Replace the example paths with your own files and quote paths containing
+spaces. The output must be separate from both inputs and must not be
+an existing file you need to preserve.
+
+The script writes the first input using `>`, then appends the second
+using `>>`. Rerunning replaces the previous output. It prints a heading
+and the combined contents to the terminal. Input files are not modified
+when the output refers to a separate file.
+
+Exit status `0` indicates success, `2` indicates an incorrect argument
+count, and `1` indicates a validation or write failure.
+A failure while displaying the output returns the final `cat` command's
+nonzero status. Errors are reported on standard error.
+
+
 ## Testing
 
 ### Assignment 1
@@ -963,16 +989,75 @@ All four checks matched the expected behaviour.
 
 The teaching starter was extended with argument-count validation,
 readable-file checks and immediate checking of the counting command's
-exit status. Comments explain the newline-counting convention and
-why counting failures must be checked before printing a result.
+exit status. Comments explain newline counting and failure handling.
 
-The following checks were completed from the
-repository root using disposable files under `sandbox/countlines_checks/`.
-Exit statuses were inspected immediately after each check.
+The following checks were completed locally.
+Temporary test files are not tracked by Git. To reproduce the checks,
+run the following commands from the repository root.
+
+Create or reset the disposable test files:
+
+```bash
+mkdir -p sandbox/countlines_checks
+
+printf 'oak\npine\n' > sandbox/countlines_checks/two_lines.txt
+printf 'oak\npine' > sandbox/countlines_checks/no_final_newline.txt
+printf '' > sandbox/countlines_checks/empty.txt
+printf 'oak\npine\n' > "sandbox/countlines_checks/field notes.txt"
+```
+
+Check syntax, normal input and boundary cases:
+
+```bash
+bash -n code/CountLines.sh
+echo "$?"
+
+bash code/CountLines.sh sandbox/countlines_checks/two_lines.txt
+echo "$?"
+
+bash code/CountLines.sh sandbox/countlines_checks/no_final_newline.txt
+echo "$?"
+
+bash code/CountLines.sh sandbox/countlines_checks/empty.txt
+echo "$?"
+
+bash code/CountLines.sh "sandbox/countlines_checks/field notes.txt"
+echo "$?"
+```
+
+Check invalid arguments and input paths. The path `missing.txt`
+must not exist:
+
+```bash
+bash code/CountLines.sh
+echo "$?"
+
+bash code/CountLines.sh sandbox/countlines_checks/two_lines.txt extra
+echo "$?"
+
+bash code/CountLines.sh sandbox/countlines_checks/missing.txt
+echo "$?"
+
+bash code/CountLines.sh sandbox/countlines_checks
+echo "$?"
+```
+
+Check an unreadable file, then restore read permission.
+Run this check as an ordinary user, not as root:
+
+```bash
+printf 'oak\n' > sandbox/countlines_checks/unreadable.txt
+chmod ugo-r sandbox/countlines_checks/unreadable.txt
+
+bash code/CountLines.sh sandbox/countlines_checks/unreadable.txt
+echo "$?"
+
+chmod u+r sandbox/countlines_checks/unreadable.txt
+```
 
 | Check | Observed result | Exit status |
 | --- | --- | --- |
-| Syntax: `bash -n code/CountLines.sh` | No syntax errors reported. | `0` |
+| Syntax | No syntax errors reported. | `0` |
 | Two newline-terminated lines | Counted `2`. | `0` |
 | Two text lines without a final newline | Counted `1`. | `0` |
 | Empty file | Counted `0`. | `0` |
@@ -983,9 +1068,142 @@ Exit statuses were inspected immediately after each check.
 | Directory input | Reported invalid input. | `1` |
 | Unreadable file | Reported invalid input. | `1` |
 
-All checks matched the expected behaviour. Rejected inputs produced
-no normal count report. Read permission on the unreadable test file
-was restored after the check.
+All checks matched the expected behaviour. Exit statuses were inspected
+immediately after the relevant commands. Rejected inputs produced
+no normal count report. Read permission was restored after testing.
+
+#### ConcatenateTwoFiles.sh
+
+The teaching starter was extended with argument-count validation,
+readable-input checks, identical-path rejection and immediate checks
+after writing and appending. The original two-step redirection was retained.
+Comments explain overwrite behaviour and the checks.
+
+The following checks were completed locally.
+Temporary test files are not tracked by Git. To reproduce the checks,
+run the following commands from the repository root.
+
+Create or reset the disposable test files:
+
+```bash
+mkdir -p sandbox/concatenate_checks
+
+printf 'oak\n' > sandbox/concatenate_checks/first.txt
+printf 'pine\n' > "sandbox/concatenate_checks/second file.txt"
+printf 'oak\npine\n' > sandbox/concatenate_checks/expected.txt
+```
+
+Check syntax, concatenation order and a filename containing spaces:
+
+```bash
+bash -n code/ConcatenateTwoFiles.sh
+echo "$?"
+
+bash code/ConcatenateTwoFiles.sh \
+    sandbox/concatenate_checks/first.txt \
+    "sandbox/concatenate_checks/second file.txt" \
+    sandbox/concatenate_checks/combined.txt
+echo "$?"
+
+diff sandbox/concatenate_checks/expected.txt sandbox/concatenate_checks/combined.txt
+echo "$?"
+```
+
+Repeat the execution and comparison to check that rerunning replaces
+the output without duplicating its contents:
+
+```bash
+bash code/ConcatenateTwoFiles.sh \
+    sandbox/concatenate_checks/first.txt \
+    "sandbox/concatenate_checks/second file.txt" \
+    sandbox/concatenate_checks/combined.txt
+echo "$?"
+
+diff sandbox/concatenate_checks/expected.txt sandbox/concatenate_checks/combined.txt
+echo "$?"
+```
+
+Check invalid arguments and inputs. The path `missing.txt` must not exist:
+
+```bash
+bash code/ConcatenateTwoFiles.sh
+echo "$?"
+
+bash code/ConcatenateTwoFiles.sh \
+    sandbox/concatenate_checks/first.txt \
+    "sandbox/concatenate_checks/second file.txt" \
+    sandbox/concatenate_checks/combined.txt extra
+echo "$?"
+
+bash code/ConcatenateTwoFiles.sh \
+    sandbox/concatenate_checks/missing.txt \
+    "sandbox/concatenate_checks/second file.txt" \
+    sandbox/concatenate_checks/combined.txt
+echo "$?"
+
+bash code/ConcatenateTwoFiles.sh \
+    sandbox/concatenate_checks/first.txt \
+    sandbox/concatenate_checks/missing.txt \
+    sandbox/concatenate_checks/combined.txt
+echo "$?"
+
+bash code/ConcatenateTwoFiles.sh \
+    sandbox/concatenate_checks \
+    "sandbox/concatenate_checks/second file.txt" \
+    sandbox/concatenate_checks/combined.txt
+echo "$?"
+```
+
+Check identical input/output path rejection using only the disposable files:
+
+```bash
+bash code/ConcatenateTwoFiles.sh \
+    sandbox/concatenate_checks/first.txt \
+    "sandbox/concatenate_checks/second file.txt" \
+    sandbox/concatenate_checks/first.txt
+echo "$?"
+
+bash code/ConcatenateTwoFiles.sh \
+    sandbox/concatenate_checks/first.txt \
+    "sandbox/concatenate_checks/second file.txt" \
+    "sandbox/concatenate_checks/second file.txt"
+echo "$?"
+```
+
+Check that both inputs are unchanged, then test a directory as the output:
+
+```bash
+printf 'oak\n' | diff - sandbox/concatenate_checks/first.txt
+echo "$?"
+
+printf 'pine\n' | diff - "sandbox/concatenate_checks/second file.txt"
+echo "$?"
+
+bash code/ConcatenateTwoFiles.sh \
+    sandbox/concatenate_checks/first.txt \
+    "sandbox/concatenate_checks/second file.txt" \
+    sandbox/concatenate_checks
+echo "$?"
+```
+
+| Check | Observed result |
+| --- | --- |
+| Syntax | Returned `0`. |
+| Normal execution with a spaced input path | Printed `oak` followed by `pine` and returned `0`; `diff` returned `0`. |
+| Repeated run | Returned `0`; `diff` confirmed no duplicated content. |
+| Missing or extra arguments | Printed usage messages and returned `2`. |
+| Either input nonexistent | Reported invalid input and returned `1`. |
+| Directory as input | Reported invalid input and returned `1`. |
+| Output path identical to either input path | Rejected the operation and returned `1`. |
+| Input protection | Both comparisons returned `0`, confirming unchanged input contents. |
+| Directory as output | Reported a write failure and returned `1`, without printing the merge heading. |
+
+All checks matched the expected behaviour. Exit statuses were inspected
+immediately after the relevant commands. A successful `diff` printed
+nothing and returned `0`.
+
+These checks do not verify detection of different paths referring
+to the same file; see Limitations.
 
 
 ## Limitations
@@ -1025,6 +1243,15 @@ do not affect this dataset.
 - The conversion of blank counts to zero is justified by this dataset's metadata and should not be assumed appropriate for other datasets.
 - Plot 12 in the May treatment, Block d, contains Q1, Q2 and Q4 only. Its mean is calculated from these three recorded quadrats. Q3 is not added as a zero-valued quadrat; the supplied files do not explain why it was not recorded.
 - The figure describes differences and variation among plots. It does not by itself establish a causal effect of cultivation timing.
+
+### Additional classroom exercises: Shell
+
+- `ConcatenateTwoFiles.sh` compares path strings when checking for
+  overlapping inputs and output. Different paths referring to the same
+  file, including symbolic and hard links, are not detected.
+  The caller must ensure the output is a separate file.
+- Existing output is overwritten. A processing failure may leave a
+  partial output; the script does not restore the previous output.
 
 ## AI assistance
 
