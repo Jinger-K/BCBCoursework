@@ -26,7 +26,7 @@ if(length(input_path) != 1) {
     stop("There must be one input path.")
 }
 
-# Reject missing and non-finite measurements before checking their ranges.
+# Check that the input file exists and is readable.
 if(!file.exists(input_path[1])) {
     stop("File doesn't exist.")
 }        
@@ -62,7 +62,7 @@ if(!is.numeric(trees$Angle.degrees)) {
     stop("Angle.degrees must be numeric.")
 }
 
-# Check if the values are finite in case it fails if()
+# Reject missing and non-finite measurements before checking their ranges.
 if(!all(is.finite(trees$Distance.m))) {
     stop("Distance.m must contain only finite values.")
 }
