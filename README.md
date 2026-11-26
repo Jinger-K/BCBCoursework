@@ -661,6 +661,26 @@ The script prints `The square of 2 is 4` and creates no output files.
 The demonstration runs at module level, so importing the module
 also prints the result.
 
+#### boilerplate.py
+
+Demonstrates a main function and main guard, separating reusable
+definitions from program startup.
+
+Requires Python 3 and no additional packages.
+Run from the repository root:
+
+```bash
+python3 code/boilerplate.py
+```
+
+No input files or command-line arguments are needed.
+Direct execution prints `This is a boilerplate`.
+Importing the module does not run `main()` automatically.
+No output files are created.
+
+
+
+
 
 ## Testing
 
@@ -1305,6 +1325,36 @@ Running `python3 code/MyExampleScript.py` from the repository root
 printed `The square of 2 is 4`, matching the independent calculation
 `2 * 2 = 4`. The exit status was inspected immediately afterwards
 using `echo "$?"` and was `0`.
+
+#### boilerplate.py
+
+Direct execution from the repository root printed
+`This is a boilerplate`. The exit status was inspected immediately
+using `echo "$?"` and was `0`.
+
+Import behaviour was also checked in a fresh Python session started
+from the repository root:
+
+```bash
+python3
+```
+
+At the Python prompt, enter each statement separately:
+
+```python
+import sys
+sys.path.insert(0, "code")
+import boilerplate
+boilerplate.main()
+exit()
+```
+
+Importing the module produced no message. Explicitly calling
+`boilerplate.main()` printed `This is a boilerplate`, as expected.
+The path adjustment applies only to this Python session.
+
+
+
 
 
 ## Limitations
