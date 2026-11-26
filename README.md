@@ -731,7 +731,89 @@ No input files or command-line arguments are needed.
 The script prints four sequences to the terminal and creates no
 output files. The examples execute at module level.
 
+#### cfexercises1.py
 
+Demonstrates square roots, comparisons, three-value sorting,
+and factorial calculation using a for loop, recursion and a while loop.
+
+Requires Python 3 and no additional packages.
+Run from the repository root:
+
+```bash
+python3 code/cfexercises1.py
+```
+
+The script prints representative function results, including comparisons
+of the three factorial methods for `0`, `1` and `5`.
+Importing the module does not run these examples.
+
+No input files or command-line arguments are needed.
+No output files are created.
+
+Functions assume non-negative real inputs for square roots,
+comparable real numbers for comparisons, and small non-negative
+integers for factorials. Invalid inputs are not explicitly checked.
+The recursive implementation is subject to Python's recursion limit.
+
+#### cfexercises2.py
+
+Demonstrates for and while loops, remainder conditions, if/elif,
+nested loops and break.
+
+Requires Python 3 and no additional packages.
+Run from the repository root:
+
+```bash
+python3 code/cfexercises2.py
+```
+
+The script runs six examples, printing greetings and a space-only
+separator line after each example. Importing the module does not
+run the examples.
+
+No input files or command-line arguments are needed.
+No output files are created.
+
+Inputs are assumed to satisfy the documented conditions.
+For integer inputs, `hello_4(x)` terminates only when `x <= 15`
+and `15 - x` is divisible by three. When `x` is True,
+`hello_6(x, y)` requires an integer starting value `y < 6`
+to reach its break condition. Invalid inputs are not explicitly checked.
+
+#### control_flow.py
+
+Defines reusable functions for parity, divisors, prime numbers and
+counting heights strictly above a threshold. A guarded main function
+prints representative results.
+
+Requires Python 3 and no additional packages.
+Run from the repository root:
+
+```bash
+python3 code/control_flow.py
+```
+
+No input files or command-line arguments are needed.
+No output files are created. Importing the module does not run
+the demonstration.
+
+#### test_control_flow.py
+
+Imports and checks the five functions in `control_flow.py` using
+assertions and an expected-exception check. It does not duplicate
+the function implementations.
+
+Run from the repository root:
+
+```bash
+python3 code/test_control_flow.py
+```
+
+Requires Python 3 and `control_flow.py` alongside it in `code/`.
+No input files or command-line arguments are needed.
+Successful execution produces no output and returns exit status `0`.
+Do not use Python's `-O` option, which disables assertions.
+No output files are created.
 
 
 
@@ -1488,7 +1570,173 @@ The output was inspected in order:
 All four sequences matched the expected values and order.
 The exit status was `0`.
 
+#### cfexercises1.py
 
+The for-loop factorial calculation was corrected from addition to
+multiplication. The recursive implementation's existing zero base case
+was retained. Docstrings and explanatory comments were added, and
+example calls were placed under a main guard.
+
+Run from the repository root:
+
+```bash
+python3 code/cfexercises1.py
+echo "$?"
+```
+
+The observed results matched independently predicted values:
+
+| Check | Observed result |
+| --- | --- |
+| Square root of `9` | `3.0` |
+| Larger of `3` and `7` | `7` |
+| Equal values `5` and `5` | `5` |
+| Sorting `3, 1, 2` | `[1, 2, 3]` |
+| Sorting with duplicates: `2, 1, 2` | `[1, 2, 2]` |
+| Three factorial methods at `0` | All returned `1`. |
+| Three factorial methods at `1` | All returned `1`. |
+| Three factorial methods at `5` | All returned `120`. |
+
+Direct execution returned exit status `0`.
+
+Import behaviour was checked in a fresh Python session started
+from the repository root:
+
+```bash
+python3
+```
+
+At the Python prompt:
+
+```python
+import sys
+sys.path.insert(0, "code")
+import cfexercises1
+print(cfexercises1.foo_4(5))
+print(cfexercises1.foo_5(0))
+exit()
+```
+
+Importing produced no output. The explicit calls printed `120` and `1`,
+respectively. Invalid inputs and large recursive inputs were not tested.
+
+#### cfexercises2.py
+
+The original loop and conditional logic was retained.
+Docstrings and explanatory comments were added, and demonstration
+calls were moved under a main guard.
+
+Run from the repository root:
+
+```bash
+python3 code/cfexercises2.py
+echo "$?"
+```
+
+The six output groups were inspected:
+
+| Call | Observed greeting count |
+| --- | --- |
+| `hello_1(12)` | `4` |
+| `hello_2(12)` | `4` |
+| `hello_3(3, 17)` | `14` |
+| `hello_4(0)` | `5` |
+| `hello_5(12)` | `8` |
+| `hello_6(True, 0)` | `6`, numbered `0` to `5` |
+
+Counts exclude the space-only separator lines.
+For `hello_2(12)`, qualifying values are `3`, `7`, `8` and `11`.
+The value `3` satisfies both conditions but prints only once
+because the second branch uses `elif`.
+Direct execution returned exit status `0`.
+
+Import and boundary behaviour were checked in a fresh Python session
+started from the repository root:
+
+```bash
+python3
+```
+
+At the Python prompt:
+
+```python
+import sys
+sys.path.insert(0, "code")
+import cfexercises2
+
+print("Check 1")
+cfexercises2.hello_1(0)
+print("Check 2")
+cfexercises2.hello_2(0)
+print("Check 3")
+cfexercises2.hello_3(3, 3)
+print("Check 4")
+cfexercises2.hello_4(15)
+print("Check 5")
+cfexercises2.hello_5(100)
+print("Check 6")
+cfexercises2.hello_6(False, 0)
+print("Check 7")
+cfexercises2.hello_6(True, 5)
+exit()
+```
+
+Importing produced no output. Checks 1–6 produced only their separator
+lines, with no greetings. Check 7 printed `hello! 5` once, followed
+by its separator line. All checks terminated as expected.
+Inputs known to cause non-termination were not executed.
+
+#### control_flow.py
+
+Run the demonstration and embedded doctests from the repository root:
+
+```bash
+python3 code/control_flow.py
+echo "$?"
+
+python3 -m doctest -v code/control_flow.py
+echo "$?"
+```
+
+The demonstration printed the expected results:
+
+```text
+22 is Even!
+33 is Odd!
+Largest divisor among 2, 3, 4 and 5: 5
+Is 59 prime? True
+Primes up to 20: [2, 3, 5, 7, 11, 13, 17, 19]
+```
+
+All three doctest examples in `even_or_odd` passed.
+Both commands returned exit status `0`.
+The other functions are checked by the separate test script below.
+
+#### test_control_flow.py
+
+Run from the repository root:
+
+```bash
+python3 code/test_control_flow.py
+echo "$?"
+```
+
+The script completed without output and returned exit status `0`.
+Its checks covered:
+
+| Function | Cases checked |
+| --- | --- |
+| `even_or_odd` | Even and odd integers, zero, a negative integer, and text rejected with `TypeError`. |
+| `largest_divisor_five` | Results of `5`, `4` and `None`. |
+| `is_prime` | Negative input, zero, one, the first two primes, and a composite number. |
+| `find_all_primes` | An upper limit below two and the known primes through ten. |
+| `count_above` | Mixed heights, values below/at/above the threshold, and an empty list. |
+
+The threshold boundary check confirmed that values equal to the
+threshold are excluded. Importing `control_flow` during the test run
+produced no demonstration output.
+
+All listed checks passed; they do not cover every possible input.
 
 
 
