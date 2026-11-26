@@ -567,10 +567,15 @@ Errors are reported on standard error.
 Combines two readable regular files in argument order.
 Requires Bash and `cat`.
 
-Run from the repository root with two input paths and one output path:
+The script takes two input paths and one output path.
+For a reproducible example, first create the temporary inputs
+described in Testing, then run from the repository root:
 
 ```bash
-bash code/ConcatenateTwoFiles.sh input1.txt input2.txt combined.txt
+bash code/ConcatenateTwoFiles.sh \
+    sandbox/concatenate_checks/first.txt \
+    "sandbox/concatenate_checks/second file.txt" \
+    sandbox/concatenate_checks/combined.txt
 ```
 
 Replace the example paths with your own files and quote paths containing
@@ -586,6 +591,10 @@ Exit status `0` indicates success, `2` indicates an incorrect argument
 count, and `1` indicates a validation or write failure.
 A failure while displaying the output returns the final `cat` command's
 nonzero status. Errors are reported on standard error.
+
+Files are concatenated without inserting a separator or newline.
+If the first input lacks a final newline, the second input begins
+immediately after its last character.
 
 #### tiff2_png.sh
 
@@ -1315,8 +1324,8 @@ do not affect this dataset.
   overlapping inputs and output. Different paths referring to the same
   file, including symbolic and hard links, are not detected.
   The caller must ensure the output is a separate file.
-- Existing output is overwritten. A processing failure may leave a
-  partial output; the script does not restore the previous output.
+- `ConcatenateTwoFiles.sh` overwrites existing output. A processing
+  failure may leave a partial output; the previous output is not restored.
 - `tiff2_png.sh` handles only lowercase `.tif` matches in the current
   directory. It does not explicitly handle no matching files,
   option-like filenames, output collisions or conversion failures.
