@@ -642,6 +642,25 @@ Return to the repository root afterwards:
 cd "$project_root"
 ```
 
+### Additional classroom exercises: Python
+
+#### MyExampleScript.py
+
+Demonstrates defining and calling a function, returning a value,
+and displaying the result with an f-string.
+
+Requires Python 3 and no additional packages.
+Run from the repository root:
+
+```bash
+python3 code/MyExampleScript.py
+```
+
+No input files or command-line arguments are needed.
+The script prints `The square of 2 is 4` and creates no output files.
+The demonstration runs at module level, so importing the module
+also prints the result.
+
 
 ## Testing
 
@@ -1278,6 +1297,14 @@ Neither `command -v magick` nor `command -v convert` returned a path.
 Actual TIFF-to-PNG conversion and output-image inspection remain
 unverified because the required converter was unavailable.
 
+### Additional classroom exercises: Python
+
+#### MyExampleScript.py
+
+Running `python3 code/MyExampleScript.py` from the repository root
+printed `The square of 2 is 4`, matching the independent calculation
+`2 * 2 = 4`. The exit status was inspected immediately afterwards
+using `echo "$?"` and was `0`.
 
 
 ## Limitations
