@@ -536,6 +536,25 @@ An unknown label produces an error message on standard error and
 exit status `1`. Successful execution returns `0`.
 No output files are created.
 
+#### CountLines.sh
+
+Counts newline characters in one readable regular file.
+Requires Bash and `wc`.
+
+Run from the repository root, supplying an input file path:
+
+```bash
+bash code/CountLines.sh data/tab-example.tsv
+```
+
+Quote paths containing spaces. The script prints the filename and
+newline count to the terminal, followed by a blank line.
+It creates no output files.
+
+An unterminated final line is not counted.
+Exit status `0` indicates success, `2` indicates an incorrect
+argument count, and `1` indicates an invalid input or counting failure.
+Errors are reported on standard error.
 
 ## Testing
 
@@ -939,6 +958,34 @@ each invocation using `echo "$?"`.
 | `oak pine` | Printed the usage message. | `2` |
 
 All four checks matched the expected behaviour.
+
+#### CountLines.sh
+
+The teaching starter was extended with argument-count validation,
+readable-file checks and immediate checking of the counting command's
+exit status. Comments explain the newline-counting convention and
+why counting failures must be checked before printing a result.
+
+The following checks were completed from the
+repository root using disposable files under `sandbox/countlines_checks/`.
+Exit statuses were inspected immediately after each check.
+
+| Check | Observed result | Exit status |
+| --- | --- | --- |
+| Syntax: `bash -n code/CountLines.sh` | No syntax errors reported. | `0` |
+| Two newline-terminated lines | Counted `2`. | `0` |
+| Two text lines without a final newline | Counted `1`. | `0` |
+| Empty file | Counted `0`. | `0` |
+| Filename containing spaces | Counted `2`. | `0` |
+| Missing argument | Printed a usage message. | `2` |
+| Extra argument | Printed a usage message. | `2` |
+| Nonexistent file | Reported invalid input. | `1` |
+| Directory input | Reported invalid input. | `1` |
+| Unreadable file | Reported invalid input. | `1` |
+
+All checks matched the expected behaviour. Rejected inputs produced
+no normal count report. Read permission on the unreadable test file
+was restored after the check.
 
 
 ## Limitations
