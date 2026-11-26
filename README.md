@@ -496,6 +496,28 @@ Requires Bash. No input files or command-line arguments are needed.
 The script reads `$USER` from the environment and prints the greeting
 to the terminal. No output files are created.
 
+#### boilerplate.sh
+
+Provides a minimal Bash script template with a shebang,
+documentation comments, a demonstration command and an exit status.
+
+Run from the repository root:
+
+```bash
+bash code/boilerplate.sh
+```
+
+Alternatively, grant executable permission and run the script directly:
+
+```bash
+chmod u+x code/boilerplate.sh
+./code/boilerplate.sh
+```
+
+Requires Bash. No input files or command-line arguments are needed.
+The script prints a demonstration message with surrounding blank lines
+to the terminal and creates no output files.
+
 
 ## Testing
 
@@ -877,6 +899,13 @@ Invalid-input checks modified only temporary copies of the data.
 The script was run from the repository root.
 It printed `Hello` followed by the value of `$USER`, as expected.
 
+#### boilerplate.sh
+
+Both `bash code/boilerplate.sh` and direct
+execution using `./code/boilerplate.sh` were checked from the
+repository root, after granting executable permission with `chmod u+x`.
+Both printed `This is a shell script!` with surrounding blank lines,
+as expected.
 
 ## Limitations
 
