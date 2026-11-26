@@ -459,6 +459,25 @@ The script also calculates total abundance within each quadrat and its mean with
 
 The figure shows one mean quadrat richness value per plot, with colours identifying blocks. May has the highest typical richness, while March and October are lower. Plot values vary within treatments and overlap between treatments; the figure alone does not establish causation.
 
+### variables.sh
+
+Demonstrates Bash positional parameters, variable assignment, interactive
+input and integer addition. Requires Bash and the external command `expr`.
+
+Run from the project root:
+
+```bash
+bash code/variables.sh
+bash code/variables.sh 1 "two words"
+```
+
+At each run, enter a string, then two integers separated by spaces.
+The script prints the arguments, updated string and sum to the terminal.
+It does not read or create files.
+
+This teaching example assumes valid integer input; it does not validate
+arbitrary input.
+
 
 ## Testing
 
@@ -822,6 +841,16 @@ and avoids inferring causation from the figure alone.
 | Infinite count (`Inf`) | Returned `1` with a finite-value error; neither output was created. |
 
 Invalid-input checks modified only temporary copies of the data.
+
+### variables.sh
+
+- `bash -n code/variables.sh` returned status `0`.
+- Runs with no arguments and with `1 "two words"` showed the expected
+  argument counts and values.
+- Interactive string input updated the displayed variable.
+- Integer inputs `3 5` and `-3 0` produced `8` and `-3`.
+- Bash arithmetic expansion was temporarily substituted for `expr`
+  and also produced `8` for `3 5`; the final script retains `expr`.
 
 
 ## Limitations
