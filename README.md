@@ -696,6 +696,26 @@ returns `using_name`.
 No input files or command-line arguments are needed.
 No output files are created.
 
+#### sysargv.py
+
+Demonstrates reading command-line arguments with `sys.argv`.
+Requires Python 3 and uses only the standard library.
+
+Run from the repository root:
+
+```bash
+python3 code/sysargv.py
+python3 code/sysargv.py oak 12
+```
+
+The script prints its invocation path, the number of user-supplied
+arguments and their list. Arguments are strings, including values
+such as `12`. Quote arguments containing spaces.
+
+No arguments are required. No input files are read and no output
+files are created.
+
+
 
 
 
@@ -1404,6 +1424,33 @@ Importing produced no message. Printing the return value of
 import printed `This module's name is: using_name`.
 These results matched the expected distinction between direct
 execution and import.
+
+#### sysargv.py
+
+The following commands were run from the repository root.
+Exit statuses were inspected immediately using `echo "$?"`.
+
+```bash
+python3 code/sysargv.py
+echo "$?"
+
+python3 code/sysargv.py oak 12
+echo "$?"
+
+python3 code/sysargv.py "two words" 12
+echo "$?"
+```
+
+| Arguments supplied | Reported count | Reported argument list | Exit status |
+| --- | --- | --- | --- |
+| None | `0` | `[]` | `0` |
+| `oak 12` | `2` | `['oak', '12']` | `0` |
+| `"two words" 12` | `2` | `['two words', '12']` | `0` |
+
+All runs reported `code/sysargv.py` as the script name.
+The results confirmed that arguments remain strings and quoted
+text containing spaces is passed as one argument.
+
 
 
 
