@@ -4,6 +4,7 @@ from observations_practice import (
     load_observations,
     parse_count,
     summarise_site,
+    suggested_total,
 )
 
 
@@ -58,11 +59,15 @@ assert summarise_site(
 ) == (None, 2)
 
 
-# Check the ordinary and boundary CSV files.
+# Check the ordinary CSV file.
 rows = load_observations("data/bootcamp_observations.csv")
 assert summarise_site(rows, "A") == (2, 1)
 assert summarise_site(rows, "B") == (0, 0)
 assert summarise_site(rows, "Z") == (None, 0)
+
+# The deliberately faulty example still passes these ordinary checks.
+assert suggested_total(rows, "A") == 2
+assert suggested_total(rows, "B") == 0
 
 boundary_rows = load_observations(
     "data/bootcamp_observations_boundary.csv"

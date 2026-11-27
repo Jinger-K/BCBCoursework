@@ -110,6 +110,10 @@ The supplied Pound Hill files are stored unchanged as
 `data/pound_hill_data.csv` and `data/pound_hill_meta_data.csv`.
 The metadata specifies that blank species counts represent observed absences, which are converted to zero during analysis.
 
+The observations exercise uses the three supplied
+`bootcamp_observations*.csv` files in `data/`.
+Additional synthetic records are defined directly in the test script.
+
 ## Usage
 
 ### unixPrac1.txt
@@ -815,6 +819,71 @@ Successful execution produces no output and returns exit status `0`.
 Do not use Python's `-O` option, which disables assertions.
 No output files are created.
 
+#### observations_practice.py
+
+Loads CSV observations, converts count text and summarises records
+by site. Requires Python 3 and the standard-library `csv` module.
+
+Run from the repository root:
+
+```bash
+python3 code/observations_practice.py
+```
+
+The report reads `data/bootcamp_observations.csv` and prints each
+distinct site's known-count total and missing-count number in
+sorted site order. No command-line arguments are needed and no
+output files are created.
+
+Each row must contain exactly the text fields `site`, `date` and
+`count`. Site and date must be non-empty. Blank counts represent
+missing observations; other counts must convert to non-negative
+integers. Every row is validated, including rows for other sites.
+
+Exact duplicate `(site, date, count)` records are counted once.
+Known zero counts remain distinct from missing values.
+A site with no known count has total `None`.
+Input rows are not modified.
+
+The module also retains `suggested_total`, a deliberately faulty
+textbook example used only for critique. The report uses
+`summarise_site`, not this faulty example.
+
+#### test_observations_practice.py
+
+Imports and tests the observation functions without copying their
+implementations. Requires Python 3, the implementation module and:
+
+- `data/bootcamp_observations.csv`
+- `data/bootcamp_observations_boundary.csv`
+- `data/bootcamp_observations_invalid.csv`
+
+Run from the repository root:
+
+```bash
+python3 code/test_observations_practice.py
+```
+
+Successful execution produces no output and returns exit status `0`.
+No output files are created.
+
+#### debugme.py
+
+Demonstrates investigating and handling division by zero.
+Requires Python 3 and no additional packages.
+
+Run from the repository root:
+
+```bash
+python3 code/debugme.py
+```
+
+The guarded demonstration calls `buggyfunc(20)`, prints successful
+divisions and a division-by-zero message, then displays the last
+successful result, `20.0`.
+
+No input files or command-line arguments are needed.
+No output files are created. The final version has no active breakpoint.
 
 
 
@@ -1738,6 +1807,117 @@ produced no demonstration output.
 
 All listed checks passed; they do not cover every possible input.
 
+#### observations_practice.py and test_observations_practice.py
+
+Input validation was extended to check the row-list type, individual
+row types and the requested site argument. The existing two-pass
+validation/deduplication and summary approach was retained.
+Docstrings, comments and the known-count variable name were clarified.
+
+After the function checks passed, the initial row-inspection block
+was replaced with a sorted per-site report.
+
+Run from the repository root:
+
+```bash
+python3 code/test_observations_practice.py
+echo "$?"
+
+python3 code/observations_practice.py
+echo "$?"
+```
+
+The test script completed without output. The report printed:
+
+```text
+Site A: known_total=2, missing_count=1
+Site B: known_total=0, missing_count=0
+```
+
+Both commands returned exit status `0`.
+
+| Check group | Verified behaviour |
+| --- | --- |
+| Count conversion | Valid integers, known zero and missing text; invalid text, negative counts and non-text input raise `ValueError`. |
+| Site summaries | Correct site selection, known totals, all-missing counts, observed zero, empty input and absent sites. |
+| Duplicate handling | Repeated nonzero and missing-count records are counted once. |
+| CSV inputs | Ordinary A/B and boundary C/D summaries match the expected tuples; invalid-file rows are checked separately. |
+| Validation | Invalid containers, row types, fields and site arguments are rejected, including invalid records for another site. |
+| Input protection | Input dictionaries and their order remain unchanged, including a duplicate-containing example. |
+| Additional synthetic example | Pound Hill returns `(10, 1)` and Silwood Park returns `(0, 1)`. |
+
+The additional records are invented test data, not real observations.
+Place names were proposed by me; record construction and expected
+results were developed with ChatGPT assistance.
+
+##### Prepared faulty-example critique
+
+The test script also checks that the deliberately faulty
+`suggested_total` returns 2 for A and 0 for B using the ordinary CSV.
+These checks passed, but do not expose its missing-value error.
+
+In an interactive Python session, the correct and deliberately faulty
+functions were compared using the boundary CSV.
+
+| Site | Correct known total | `suggested_total` |
+| --- | --- | --- |
+| C: all counts missing | `None` | `0` |
+| D: observed zero | `0` | `0` |
+
+The assertion that the correct C total is `None` passed.
+The equivalent assertion for `suggested_total` raised the expected
+`AssertionError`. This deliberate failure was run interactively
+and was not added to the normal test script.
+
+The faulty function starts at zero and never records whether a known
+count was encountered. Ordinary A/B checks do not expose this defect;
+the all-missing C boundary does. The faulty function was rejected
+for reporting, and the normal test script was rerun successfully.
+
+Verification in a fresh Git clone and comparison with a peer's
+fresh run remain pending.
+
+#### debugme.py
+
+A temporary version without exception handling was used to inspect
+the state immediately before division by zero. A conditional
+`breakpoint()` was placed after decrementing y, when y reached zero.
+
+The temporary script was run from the repository root:
+
+```bash
+python3 code/debugme.py
+```
+
+At the Pdb prompt, `p i`, `p x`, `p y`, `p z` and `l` were used.
+
+| Variable | Observed value |
+| --- | --- |
+| `i` | `19` |
+| `x` | `20` |
+| `y` | `0` |
+| `z` | `20.0` |
+
+The next division would use a zero denominator. The value of z was
+left over from the preceding successful division, not a result
+of dividing by zero. The debugger was exited using `q`, with
+confirmation to terminate the process.
+
+The temporary breakpoint was removed and the exception-handling
+version restored. A specific `except ZeroDivisionError` was retained;
+the broad exception handler was removed so unexpected errors remain
+visible. Docstrings and a guarded demonstration were added.
+
+The final version was checked with:
+
+```bash
+python3 code/debugme.py
+echo "$?"
+```
+
+It printed 19 successful-division messages, one division-by-zero
+message and `Returned value: 20.0`. It completed without pausing
+and returned exit status `0`.
 
 
 
@@ -1794,6 +1974,22 @@ do not affect this dataset.
   option-like filenames, output collisions or conversion failures.
   Existing PNG outputs may be overwritten, and the script's final
   exit status does not establish that every conversion succeeded.
+
+### Additional classroom exercises: Python
+
+- Observation dates are checked only for non-empty text; calendar
+  validation and whitespace normalisation are outside this exercise.
+- Exact-duplicate removal is a teaching assumption, not a universal
+  rule for ecological observations.
+- Known-count totals exclude missing observations and do not estimate
+  their contribution.
+- `suggested_total` is deliberately incorrect for all-missing data
+  and must not be used as the reporting implementation.
+- `debugme.py` is a teaching demonstration using `x = 20`, not a
+  general numerical algorithm. Its function assumes an integer
+  input of at least two and does not validate other inputs.
+  Catching division by zero preserves the previous successful
+  result; it does not make the failed division valid.
 
 
 ## AI assistance
