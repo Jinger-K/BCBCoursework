@@ -119,8 +119,6 @@ Install missing R packages once from an R session:
 install.packages(c("reshape2", "dplyr", "tidyr", "ggplot2"))
 ```
 
-`tidyverse` installs the required `dplyr`, `tidyr` and `ggplot2` packages.
-
 `tiff2_png.sh` requires ImageMagick's `convert` command.
 Conversion checks used ImageMagick 7.1.2-18.
 
@@ -153,8 +151,6 @@ figures are written separately to `results/`.
 
 The supplied exercise datasets are from the
 [MulQuaBio course materials](https://mulquabio.github.io/MQB/).
-The consumer–resource dataset is attributed in the course material
-to Barnes et al. (2008), Ecology 89:881.
 
 Blank Pound Hill species counts represent observed absences and
 are converted to zero according to its metadata. Blank counts in
@@ -1294,6 +1290,12 @@ same fresh clone using ImageMagick 7.1.2-18. Both synthetic test
 images converted successfully, retaining their dimensions and
 showing zero differing pixels. Details are recorded under
 `tiff2_png.sh` below.
+
+The verification clone was subsequently updated to commit e2a3b71
+using git pull --ff-only. This update removed the additional basic
+plotting exercise and its dedicated dataset, and revised the README.
+The working tree remained clean. The full test batch was not rerun
+after this cleanup.
 
 #### Changes after formative feedback: FASTA commands
 
@@ -2878,3 +2880,17 @@ and inspected the outputs.
 
 For Assignment 3, I used ChatGPT during 19–23 October 2026 for explanations of R syntax and task requirements, help understanding errors, hints when stuck, suggestions for small checks, and README documentation help.
 I checked adopted suggestions against the MQB materials and metadata, inspected intermediate tables and the figure, and independently ran the scripts, boundary checks and repeated-run comparisons.
+
+### Assignment 4: cumulative revision
+
+During 2–27 November 2026, I used ChatGPT to clarify coursework
+requirements and formative feedback, explain programming concepts
+and error messages, review existing code, suggest targeted checks,
+and help organise and edit the README.
+
+ChatGPT also provided example verification commands, including
+commands for comparing outputs and checking a fresh clone.
+I ran the checks locally, inspected terminal output, tables and
+figures, and compared selected results with calculations performed
+separately from the functions being checked. I reviewed suggestions against
+the course materials before adopting them.
