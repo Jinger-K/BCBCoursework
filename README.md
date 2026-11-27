@@ -885,6 +885,37 @@ successful result, `20.0`.
 No input files or command-line arguments are needed.
 No output files are created. The final version has no active breakpoint.
 
+### Additional classroom exercises: R
+
+#### basic_io.R
+
+Demonstrates reading data and writing, appending and overwriting files
+using base R. No command-line arguments or additional packages are required.
+
+- Input: `data/trees.csv`, with a header row.
+- Output: `results/MyData.csv`; the script creates `results/` if needed.
+- Run all commands from the repository root.
+
+From the shell:
+
+```bash
+Rscript code/basic_io.R
+```
+
+Alternatively, start a clean R session with `R --vanilla`, then enter:
+
+```r
+source("code/basic_io.R")
+q(save = "no")
+```
+
+The append step produces the expected warning
+`appending column names to file`. Later writes overwrite that intermediate
+content. The final file includes row names and omits column names;
+it is space-separated despite its `.csv` filename.
+
+
+
 
 
 
@@ -1918,6 +1949,41 @@ echo "$?"
 It printed 19 successful-division messages, one division-by-zero
 message and `Returned value: 20.0`. It completed without pausing
 and returned exit status `0`.
+
+### Additional classroom exercises: R
+
+#### basic_io.R
+
+Corrected the append path from `results/MyData,csv` to
+`results/MyData.csv`, added output-directory creation and clarified comments.
+The original sequence of file-writing demonstrations was retained.
+
+Run from the repository root:
+
+```bash
+Rscript code/basic_io.R
+echo "$?"
+```
+
+The script printed `Script complete!`, produced the expected append-header
+warning and returned exit status `0`. Sourcing the script in an
+`R --vanilla` session also completed successfully.
+
+Interactive checks confirmed that:
+
+- The initial CSV contained column names and row names.
+- Appending added a header and the first data record, increasing the
+  line count by two.
+- The next CSV write overwrote the appended content.
+- The final table write omitted column names and used spaces as separators.
+
+The final output was read back using `read.table()` with `header = FALSE`
+and `row.names = 1`. After restoring the column names, its dimensions and
+data matched the input using `all.equal()`.
+
+Running the script again produced the same final output file,
+without accumulating extra rows.
+
 
 
 

@@ -2,14 +2,23 @@
 # Run from the coursework project root with:
 # Rscript code/basic_io.R
 
-MyData <- read.csv("data/trees.csv", header = TRUE) # Import with headers
+MyData <- read.csv("data/trees.csv", header = TRUE)
 
-write.csv(MyData, "results/MyData.csv") # Write it as a new file
+# Create the output directory if it does not already exist.
+if (!dir.exists("results")) {
+    dir.create("results")
+}
 
-write.table(MyData[1, ], file = "results/MyData,csv", append = TRUE)
+# Write the full dataset, including row names by default.
+write.csv(MyData, "results/MyData.csv")
 
+# Append the first row; appending column names produces an expected warning.
+write.table(MyData[1, ], file = "results/MyData.csv", append = TRUE)
+
+# Overwrite the file, explicitly including row names.
 write.csv(MyData, "results/MyData.csv", row.names = TRUE)
 
-write.table(MyData, "results/MyData.csv", col.names = FALSE) # Omit column names
+# Overwrite again without column names; write.table uses spaces by default.
+write.table(MyData, "results/MyData.csv", col.names = FALSE)
 
 print("Script complete!")
