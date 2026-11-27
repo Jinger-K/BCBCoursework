@@ -962,6 +962,54 @@ q(save = "no")
 The random conditional message appears only when the generated value
 is at most 0.5, so its presence may differ between runs.
 
+#### r_conditionals.R
+
+Defines functions that return messages describing integer parity,
+powers of 2 and primality.
+
+Requires base R only. No command-line arguments, input files or
+output files are used. Function inputs are assumed to be single
+finite integers.
+
+Run from the repository root:
+
+```bash
+Rscript code/r_conditionals.R
+```
+
+Alternatively, start R with `R --vanilla` from the repository root,
+then enter:
+
+```r
+source("code/r_conditionals.R")
+q(save = "no")
+```
+
+Both methods print the three demonstration results. Sourcing also
+makes `is.even`, `is.power2` and `is.prime` available for further calls.
+The power-of-2 check includes 1, since `1 = 2^0`.
+
+#### break.R
+
+Demonstrates using `break` to exit a `while` loop when the counter
+reaches 10, printing values from 0 to 9.
+
+Requires base R only. No command-line arguments, input files or
+output files are used.
+
+Run from the repository root:
+
+```bash
+Rscript code/break.R
+```
+
+Alternatively, start R with `R --vanilla` from the repository root,
+then enter:
+
+```r
+source("code/break.R")
+q(save = "no")
+```
 
 
 
@@ -2005,15 +2053,9 @@ Corrected the append path from `results/MyData,csv` to
 `results/MyData.csv`, added output-directory creation and clarified comments.
 The original sequence of file-writing demonstrations was retained.
 
-Run from the repository root:
-
-```bash
-Rscript code/basic_io.R
-echo "$?"
-```
-
-The script printed `Script complete!`, produced the expected append-header
-warning and returned exit status `0`. Sourcing the script in an
+The Rscript command under Usage printed `Script complete!`, produced
+the expected append-header warning and returned exit status `0`.
+Sourcing the script in an
 `R --vanilla` session also completed successfully.
 
 Interactive checks confirmed that:
@@ -2064,7 +2106,40 @@ conditional block, confirming the FALSE-branch message. Testing
 `z <= 0.5` with 0.4, 0.5 and 0.6 produced the conditional message for
 the first two values only, confirming that equality is included.
 
+#### r_conditionals.R
 
+Added a separate prime case for 2, avoiding the incorrect divisor
+sequence `2:1`. Added handling for negative prime inputs and
+non-positive power-of-2 inputs. Retained the original messages for
+0 and 1 in the prime function. Explicit printing makes demonstration
+results visible with both execution methods.
+
+The Rscript command under Usage returned exit status `0`.
+Sourcing in a clean R session also printed the three expected
+demonstration results.
+
+Additional interactive calls produced the expected results:
+
+| Function | Inputs checked | Results |
+| --- | --- | --- |
+| `is.even` | 5, 0, -2 | Odd, even, even |
+| `is.power2` | 1, 2, 8 | Powers of 2 |
+| `is.power2` | 3, 0, -2 | Not powers of 2 |
+| `is.prime` | -1 | Not prime |
+| `is.prime` | 0, 1 | Original zero and unit messages |
+| `is.prime` | 2, 3 | Prime |
+| `is.prime` | 4, 9 | Composite |
+
+#### break.R
+
+Corrected misleading comments and standardised indentation while
+retaining the original loop and `break` condition.
+
+Both execution methods under Usage printed values from 0 to 9 and
+terminated normally. Rscript returned exit status `0`.
+
+After sourcing in a clean R session, entering `i` returned `10`,
+confirming that the loop exited before printing the stopping value.
 
 
 
@@ -2136,6 +2211,12 @@ do not affect this dataset.
   input of at least two and does not validate other inputs.
   Catching division by zero preserves the previous successful
   result; it does not make the failed division valid.
+
+### Additional classroom exercises: R
+- `r_conditionals.R` assumes single finite integer inputs and does not
+  validate other types. Its logarithm-based power check and divisor
+  sequence are intended for small teaching examples, rather than
+  large-number computation.
 
 
 ## AI assistance
