@@ -1141,7 +1141,73 @@ The script creates `results/` if needed and writes
 `results/observations_known_totals.pdf`, replacing the PDF on reruns.
 No summary CSV is written.
 
+#### data_wrang.R
 
+Reshapes the Pound Hill dataset from wide to long format using
+`reshape2::melt()`.
+
+Requires R and `reshape2`. If needed, install the package in R:
+
+```r
+install.packages("reshape2")
+```
+
+Run from the repository root:
+
+```bash
+Rscript code/data_wrang.R
+```
+
+No command-line arguments are required. Inputs are:
+
+- `data/pound_hill_data.csv`, read without a header.
+- `data/pound_hill_meta_data.csv`, read with a header and semicolon separators.
+
+The script inspects and transposes the raw table, sets column names
+and converts blank species counts to zero, as specified by the metadata.
+It reshapes species columns into `Species` and `Count`, retaining
+`Cultivation`, `Block`, `Plot` and `Quadrat` as identifiers.
+
+The four identifier columns and `Species` are factors; `Count` is
+integer. The script writes `results/pound_hill_long.csv` without row
+names, creates `results/` if needed and replaces the CSV on reruns.
+The raw files are only read. No figure is generated.
+
+#### data_wrang_tidy.R
+
+Recreates the Pound Hill wide-to-long transformation using
+`tidyr::pivot_longer()` and `dplyr::mutate()`.
+
+Requires R 4.1 or later for the native pipe, plus `dplyr` and `tidyr`.
+Install missing packages in R:
+
+```r
+install.packages(c("dplyr", "tidyr"))
+```
+
+Run from the repository root:
+
+```bash
+Rscript code/data_wrang_tidy.R
+```
+
+No command-line arguments are required. Inputs are:
+
+- `data/pound_hill_data.csv`, read without a header.
+- `data/pound_hill_meta_data.csv`, read with a header and semicolon separators.
+
+The script transposes the raw table, assigns column names and converts
+blank species counts to zero according to the metadata. It retains
+`Cultivation`, `Block`, `Plot` and `Quadrat` as identifiers, and gathers
+species columns into `Species` and `Count`.
+
+The five categorical columns are factors; `Count` is integer.
+The script creates `results/` if needed and writes
+`results/pound_hill_long.csv` without row names. No figure is generated.
+
+This output path is shared with `data_wrang.R`: whichever script runs
+last replaces the CSV. Their row order differs, but their records
+should match after sorting. The raw input files are only read.
 
 ## Testing
 
@@ -2310,6 +2376,12 @@ They returned `"list"`, `15`, `"try-error"` and `"character"`,
 respectively, confirming that a failed attempt was stored and
 later attempts still completed.
 
+The histogram PDF was opened and visually inspected.
+The title, axes and bars were readable, with no obvious clipping.
+The displayed bin frequencies totalled 50, matching the size of
+popn. This figure shows the original generated population,
+not the means from the subsequent sampling attempts.
+
 #### browse.R
 
 Removed the unrelated commented-out example, clarified comments
@@ -2413,7 +2485,213 @@ R reported incomplete-final-line warnings because the supplied CSV
 files lack a trailing newline. The records were read correctly, and
 the supplied files were retained unchanged.
 
-Verification in a fresh Git clone remains pending.
+##### Critique and comparison with Python
+
+Missing observations and observed zeros have different meanings.
+Removing missing values is useful when summing known counts, but
+`sum(c(NA_integer_, NA_integer_), na.rm = TRUE)` returns zero even
+though no count was observed. The summary must first distinguish
+an all-missing site from one containing a known zero. The assertion
+that C's total is NA detects this error; D checks the observed-zero case.
+
+Exact duplicate rows must be removed before summarising. Otherwise,
+A's repeated count of 2 produces a total of 4 instead of 2.
+Checking only the number of sites would miss this error because
+the duplicate does not introduce another site. The assertion that
+A's total equals 2 detects it. Removing duplicate count values alone
+is inappropriate: different observations can legitimately have
+the same count.
+
+Both R and Python should apply the same validation, exact-row
+deduplication and missing-versus-zero rules. Their representations
+differ: R uses NA for missing counts and all-missing totals, whereas
+the Python implementation uses None. R's sum() defaults to propagating
+NA; using na.rm = TRUE therefore requires an explicit all-missing check.
+
+An informative validation error identifies the file, CSV line,
+column, offending value and expected format. For the original many
+entry, an appropriate message would be:
+
+    bootcamp_observations_invalid.csv: CSV line 3, column 'count':
+    found 'many'; expected an empty field or a non-negative integer.
+
+The separate many test used a temporary file containing only that
+record, so its reported CSV line was 2, including the header.
+Invalid values are reported rather than silently replaced.
+
+#### data_wrang.R
+
+The Usage command returned exit status `0` on 27 November 2026.
+Additional checks were performed in R 4.5.2, starting with
+`R --vanilla` from the repository root.
+
+| Check | Observed result |
+| --- | --- |
+| Input structure | Raw matrix: 45 rows × 60 columns; transposed matrix: 60 × 45. |
+| Long-table structure | 2419 rows × 6 columns, representing 41 species across 59 sampled quadrats. |
+| Counts | Integer, non-negative and without missing values. |
+| Record uniqueness | No duplicated combination of the four identifiers and species. |
+| Raw-to-long comparison | Every species count and its four sample identifiers matched the raw table, with blanks treated as zero. |
+| CSV readback | Saved contents matched the in-memory table after converting factors to character for comparison. |
+| Repeated execution | Both the in-memory table and CSV text were identical between runs. |
+
+To reproduce the additional checks, start a clean R session from
+the repository root and enter:
+
+```r
+source("code/data_wrang.R")
+
+stopifnot(
+    identical(dim(MyWrangledData), c(2419L, 6L)),
+    !anyNA(MyWrangledData),
+    all(MyWrangledData$Count >= 0),
+    anyDuplicated(MyWrangledData[1:5]) == 0L
+)
+
+raw <- read.csv(
+    "data/pound_hill_data.csv",
+    header = FALSE,
+    colClasses = "character",
+    na.strings = ""
+)
+
+for (i in 5:nrow(raw)) {
+    actual <- MyWrangledData[
+        as.character(MyWrangledData$Species) == raw[i, 1],
+    ]
+
+    expected <- as.integer(unlist(raw[i, -1], use.names = FALSE))
+    expected[is.na(expected)] <- 0L
+    stopifnot(identical(actual$Count, expected))
+
+    for (j in 1:4) {
+        stopifnot(identical(
+            as.character(actual[[j]]),
+            unlist(raw[j, -1], use.names = FALSE)
+        ))
+    }
+}
+
+saved <- read.csv(
+    "results/pound_hill_long.csv",
+    colClasses = c(rep("character", 5), "integer")
+)
+expected_table <- MyWrangledData
+expected_table[1:5] <- lapply(expected_table[1:5], as.character)
+stopifnot(identical(saved, expected_table))
+
+previous <- MyWrangledData
+previous_csv <- readLines("results/pound_hill_long.csv")
+source("code/data_wrang.R")
+stopifnot(
+    identical(previous, MyWrangledData),
+    identical(previous_csv, readLines("results/pound_hill_long.csv"))
+)
+
+q(save = "no")
+```
+
+All corresponding checks passed without assertion errors. Fresh-clone verification
+remains pending.
+
+#### data_wrang_tidy.R
+
+Checks were completed on 27 November 2026 in R 4.5.2, using an
+`R --vanilla` session started from the repository root.
+
+| Check | Observed result |
+| --- | --- |
+| Small-table transformation | Two sites and two species produced the four expected records, preserving counts and zeros. |
+| Structure and types | 2419 rows × 6 columns; five factors and integer Count. |
+| Counts and record uniqueness | No missing values, negative counts or duplicate sample–species combinations. |
+| Comparison with reshape2 | All records matched after normalising table types, categorical columns and row order. |
+| CSV readback | Saved contents matched the tidy table after converting factors to character. |
+| Repeated execution | The in-memory result and CSV text were identical between runs. |
+
+To reproduce these checks, start a clean R session from the repository
+root and enter the following. The comparison also requires `reshape2`.
+
+```r
+small <- data.frame(
+    Site = c("A", "B"),
+    Species1 = c(2L, 0L),
+    Species2 = c(0L, 3L)
+)
+
+small_long <- tidyr::pivot_longer(
+    small,
+    cols = -Site,
+    names_to = "Species",
+    values_to = "Count"
+)
+
+stopifnot(
+    identical(small_long$Site, c("A", "A", "B", "B")),
+    identical(
+        small_long$Species,
+        c("Species1", "Species2", "Species1", "Species2")
+    ),
+    identical(small_long$Count, c(2L, 0L, 0L, 3L))
+)
+
+source("code/data_wrang.R")
+reshape_result <- MyWrangledData
+
+source("code/data_wrang_tidy.R")
+tidy_result <- MyWrangledData
+
+stopifnot(
+    identical(dim(tidy_result), c(2419L, 6L)),
+    identical(
+        names(tidy_result),
+        c("Cultivation", "Block", "Plot", "Quadrat", "Species", "Count")
+    ),
+    all(vapply(tidy_result[1:5], is.factor, logical(1))),
+    is.integer(tidy_result$Count),
+    !anyNA(tidy_result),
+    all(tidy_result$Count >= 0),
+    anyDuplicated(tidy_result[1:5]) == 0L
+)
+
+normalise <- function(x) {
+    x <- as.data.frame(x)
+    x[1:5] <- lapply(x[1:5], as.character)
+    x <- x[do.call(order, x[1:5]), ]
+    rownames(x) <- NULL
+    return(x)
+}
+
+stopifnot(identical(
+    normalise(reshape_result),
+    normalise(tidy_result)
+))
+
+saved <- read.csv(
+    "results/pound_hill_long.csv",
+    colClasses = c(rep("character", 5), "integer")
+)
+
+expected <- as.data.frame(tidy_result)
+expected[1:5] <- lapply(expected[1:5], as.character)
+stopifnot(identical(saved, expected))
+
+previous_csv <- readLines("results/pound_hill_long.csv")
+source("code/data_wrang_tidy.R")
+
+stopifnot(
+    identical(tidy_result, MyWrangledData),
+    identical(previous_csv, readLines("results/pound_hill_long.csv"))
+)
+
+q(save = "no")
+```
+
+All checks passed without warnings or assertion errors.
+The reshape2 reference result had previously been checked against
+every raw species count and its sample identifiers.
+
+Creation of an absent `results/` directory was reviewed in the code
+but not separately tested. Fresh-clone verification remains pending.
 
 
 ## Limitations
