@@ -13,3 +13,8 @@ __pycache__/
 # Ignore generated results but keep the directory placeholder
 /results/*
 !/results/.gitkeep
+
+# R session files and default plot output
+.RData
+.Rhistory
+Rplots.pdf
