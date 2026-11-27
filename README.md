@@ -1064,6 +1064,82 @@ while failed entries have class `"try-error"`.
 
 Rerunning replaces the histogram PDF.
 
+#### browse.R
+
+Demonstrates interactive debugging with `browser()` during an
+exponential-growth simulation.
+
+Requires base R only. No command-line arguments or input files are
+needed. The example assumes `generations` is an integer of at least 2.
+
+From the repository root, start an interactive R session:
+
+```bash
+R --vanilla
+```
+
+At the R prompt, enter:
+
+```r
+source("code/browse.R")
+```
+
+At each `Browse[...]` prompt, inspect variables using `ls()`, `t`
+and `N`. Use `n` to step or `c` to continue. The breakpoint is inside
+the loop, so continuing pauses again on subsequent iterations.
+
+After continuing through all iterations, the script saves
+`results/browse_exponential.pdf` and closes the PDF device.
+The directory is created if needed; rerunning replaces the PDF.
+
+To abort debugging, enter uppercase `Q`. Because the PDF device
+opens before the simulation, an aborted run requires `dev.off()`
+at the ordinary R prompt to close it. That run may leave an
+incomplete PDF.
+
+Exit R with `q(save = "no")`. This exercise is intended for
+interactive sourcing.
+
+#### observations_practice.R
+
+Reads, validates and summarises ecological observations using functions,
+loops, missing-value handling, assertions and base-R plotting.
+
+Requires base R only. Run from the repository root:
+
+```bash
+Rscript code/observations_practice.R
+```
+
+No command-line arguments are required. The script reads:
+
+| Input | Purpose |
+| --- | --- |
+| `data/bootcamp_observations.csv` | Ordinary observations, including a duplicate and a missing count. |
+| `data/bootcamp_observations_boundary.csv` | All-missing counts and duplicated observed zeros. |
+| `data/bootcamp_observations_invalid.csv` | Invalid counts for error-handling checks. |
+
+Each CSV must contain exactly the columns `site,date,count` in that
+order. Site and date must be non-empty. Blank counts represent missing
+observations; other counts must be non-negative integers within R's
+integer range.
+
+`read_observations()` reads fields as text, validates them and converts
+counts to integers. `summarise_observations()` removes exact duplicate
+rows and calculates each site's known-count total and missing-count
+number, retaining site order of first occurrence.
+
+Known zeros remain distinct from missing values. A site with only
+missing counts has total `NA`.
+
+The script prints the ordinary data, both summary tables and the
+expected invalid-input error caught by `try()`. Embedded assertions
+check the four site summaries and confirm that the invalid file
+raises an error.
+
+The script creates `results/` if needed and writes
+`results/observations_known_totals.pdf`, replacing the PDF on reruns.
+No summary CSV is written.
 
 
 
@@ -2234,6 +2310,110 @@ They returned `"list"`, `15`, `"try-error"` and `"character"`,
 respectively, confirming that a failed attempt was stored and
 later attempts still completed.
 
+#### browse.R
+
+Removed the unrelated commented-out example, clarified comments
+and formatting, and directed the plot to `results/`.
+The growth calculation and breakpoint after each update were retained.
+
+Interactive inspection in a clean R session showed:
+
+- At the first pause, `t` was 2; `N0`, `r` and `generations` were
+  1, 1 and 10.
+- The first two population values were 1 and approximately 2.718282,
+  with later entries still `NA`.
+- After stepping to `t = 5`, the first five values were approximately
+  1, 2.718282, 7.389056, 20.085537 and 54.598150.
+
+Continuing with `c` through the remaining pauses returned to the
+ordinary R prompt. The saved version generated the PDF successfully.
+
+Additional checks were:
+
+```r
+file.exists("results/browse_exponential.pdf")
+file.info("results/browse_exponential.pdf")$size
+dev.cur()
+```
+
+They returned `TRUE`, 4615 bytes and `null device 1`, respectively.
+
+Visual inspection of the generated plot confirmed a readable title
+and axes, with an increasing trajectory consistent with exponential
+growth. The final plotted value was approximately 8100.
+
+#### observations_practice.R
+
+The script was run and sourced in an R 4.5.2 session started with
+`R --vanilla` from the repository root. On 27 November 2026, its
+summaries were independently checked against the supplied CSV records.
+
+| Site | Counts after exact-row deduplication | Known total | Missing count |
+| --- | --- | --- | --- |
+| A | 2 and NA | 2 | 1 |
+| B | 0 | 0 | 0 |
+| C | NA and NA, on different dates | NA | 2 |
+| D | 0 | 0 | 0 |
+
+These results matched the embedded assertions. A's duplicate record
+contributes only once. D's duplicate zero record is also removed.
+Both C records remain because their dates differ.
+
+The supplied invalid CSV triggered the expected error for -1.
+Because reading stops at the first invalid count, many was checked
+separately using a temporary CSV containing the second input record.
+
+To reproduce the additional checks, start `R --vanilla` from the
+repository root and enter:
+
+```r
+source("code/observations_practice.R")
+
+invalid_data <- read.csv(
+    "data/bootcamp_observations_invalid.csv",
+    colClasses = "character"
+)
+
+temporary_csv <- tempfile(fileext = ".csv")
+write.csv(
+    invalid_data[2, , drop = FALSE],
+    temporary_csv,
+    row.names = FALSE
+)
+
+many_result <- try(read_observations(temporary_csv), silent = TRUE)
+
+stopifnot(
+    inherits(many_result, "try-error"),
+    grepl("found many", as.character(many_result), fixed = TRUE)
+)
+
+print(many_result)
+unlink(temporary_csv)
+
+previous_summary <- all_summaries
+source("code/observations_practice.R")
+stopifnot(identical(previous_summary, all_summaries))
+print("Repeated-run summaries match.")
+
+q(save = "no")
+```
+
+The many check passed and printed the expected caught error.
+The repeated-run comparison also passed, printing
+`Repeated-run summaries match.` No supplied CSV was edited by
+these checks.
+
+The regenerated PDF was opened and inspected. It showed A at 2,
+B and D at 0, and no point for C. The subtitle correctly explained
+C's all-missing counts. The title, axes and site labels were readable,
+with no obvious clipping or overlap.
+
+R reported incomplete-final-line warnings because the supplied CSV
+files lack a trailing newline. The records were read correctly, and
+the supplied files were retained unchanged.
+
+Verification in a fresh Git clone remains pending.
 
 
 ## Limitations
@@ -2309,6 +2489,14 @@ do not affect this dataset.
   validate other types. Its logarithm-based power check and divisor
   sequence are intended for small teaching examples, rather than
   large-number computation.
+- `observations_practice.R` checks dates only for non-empty text;
+  it does not validate calendar dates or normalise whitespace.
+- Exact-row deduplication is an assumption of this exercise, rather
+  than a general rule for ecological observations.
+- Known-count totals exclude missing observations and do not estimate
+  their contribution.
+- The figure uses a fixed vertical range of 0–3, suitable for the
+  supplied data; larger totals would require adjusting this range.
 
 
 ## AI assistance
