@@ -21,16 +21,26 @@ BCBCoursework/
 ├── .gitignore
 ├── Feedback/
 │   ├── assignment-1-2026.md
-│   └── assignment-2-2026.md
+│   ├── assignment-2-2026.md
+│   └── assignment-3-2026.md
 ├── code/
+│   ├── CheckLabel.sh
+│   ├── ConcatenateTwoFiles.sh
+│   ├── CountLines.sh
+│   ├── MyExampleScript.py
+│   ├── MyExampleScript.sh
 │   ├── TreeHeight.R
 │   ├── basic_io.R
-│   ├── basic_plotting_commands_in_R
 │   ├── boilerplate.R
+│   ├── boilerplate.py
+│   ├── boilerplate.sh
 │   ├── break.R
 │   ├── browse.R
+│   ├── cfexercises1.py
+│   ├── cfexercises2.py
 │   ├── clean_silwood_trees.py
 │   ├── control_flow.R
+│   ├── control_flow.py
 │   ├── csvtospace.sh
 │   ├── data_wrang.R
 │   ├── data_wrang_tidy.R
@@ -43,10 +53,16 @@ BCBCoursework/
 │   ├── pound_hill_analysis.R
 │   ├── r_conditionals.R
 │   ├── run_get_TreeHeight.sh
+│   ├── sysargv.py
 │   ├── tabtocsv.sh
+│   ├── test_control_flow.py
+│   ├── test_observations_practice.py
 │   ├── test_silwood_trees.py
+│   ├── tiff2_png.sh
 │   ├── try.R
-│   └── unixPrac1.txt
+│   ├── unixPrac1.txt
+│   ├── using_name.py
+│   └── variables.sh
 ├── data/
 │   ├── fasta/
 │   │   ├── 407228326.fasta
@@ -57,6 +73,9 @@ BCBCoursework/
 │   │   ├── 1801.csv
 │   │   ├── 1802.csv
 │   │   └── 1803.csv
+│   ├── bootcamp_observations.csv
+│   ├── bootcamp_observations_boundary.csv
+│   ├── bootcamp_observations_invalid.csv
 │   ├── pound_hill_data.csv
 │   ├── pound_hill_meta_data.csv
 │   ├── silwood_trees_metadata.md
@@ -67,52 +86,88 @@ BCBCoursework/
     └── .gitkeep
 ```
 
-Required code and inputs are committed. Generated results, temporary files and the local virtual environment are ignored. Only `.gitkeep` is tracked inside `results/`.
+Required scripts and inputs are tracked in Git. Generated results,
+the Python virtual environment, caches and R session files are ignored.
+Only `.gitkeep` is tracked inside `results/`. Other local practice
+and editor files are not part of the submitted repository.
 
 ## Requirements
 
-Tested on Ubuntu 26.04.1 LTS with Bash 5.3.9 and Git 2.53.0. Python 3.14.4 is used for additional classroom exercises.
+Development checks used Ubuntu 26.04.1 LTS, Bash 5.3.9,
+Git 2.53.0, Python 3.14.4 and R 4.5.2.
+Fresh-clone Python checks were also run after deactivating the
+development virtual environment.
 
-The UNIX exercises require bc for decimal division, alongside standard command-line tools such as tail, grep and xargs.
+Python scripts use the standard library.
+Shell exercises use Bash and standard command-line tools;
+the FASTA ratio calculation additionally requires `bc`.
 
-The Assignment 2 cleaner and test script require Python 3 and use only the standard library. No additional Python packages are needed.
+The tidy R script requires R 4.1 or later for the native pipe.
+Additional R packages are:
 
-The Assignment 3 analyses require R. The R analyses were tested with R 4.5.2 (2025-10-31).
-The tree-height scripts use base R only. The Pound Hill analysis requires
-`reshape2`, `dplyr` and `ggplot2`.
+| Scripts | Packages |
+| --- | --- |
+| `pound_hill_analysis.R` | `reshape2`, `dplyr`, `ggplot2` |
+| `data_wrang.R` | `reshape2` |
+| `data_wrang_tidy.R` | `dplyr`, `tidyr` |
 
-Install missing packages from an R session:
+Other documented R scripts use base R.
+
+Install missing R packages once from an R session:
 
 ```r
-install.packages(c("reshape2", "dplyr", "ggplot2"))
+install.packages(c("reshape2", "dplyr", "tidyr", "ggplot2"))
 ```
-The additional `tiff2_png.sh` classroom exercise requires ImageMagick.
-The current script uses `convert`; environments providing only `magick`
-require the command in the script to be changed accordingly.
-Neither command was found on the machine used for this review,
-so image conversion was not tested.
+
+`tidyverse` installs the required `dplyr`, `tidyr` and `ggplot2` packages.
+
+`tiff2_png.sh` requires ImageMagick's `convert` command.
+Conversion checks used ImageMagick 7.1.2-18.
+
+## Data
+
+All required input files are included in `data/`; no additional
+download is needed for the documented CSV and FASTA workflows.
+Supplied source files are retained unchanged. Derived tables and
+figures are written separately to `results/`.
+
+| Input path, relative to data/ | Contents and use |
+| --- | --- |
+| `fasta/407228326.fasta` | Supplied sequence used for the FASTA inspection and newline-count exercise. |
+| `fasta/407228412.fasta` | Supplied sequence used for the FASTA inspection and newline-count exercise. |
+| `fasta/e_coli.fasta` | Supplied E. coli sequence used for header removal, sequence length, motif counting and the AT/GC ratio. |
+| `temperatures/1800.csv` | Supplied input for comma-to-space conversion. |
+| `temperatures/1801.csv` | Supplied input for comma-to-space conversion. |
+| `temperatures/1802.csv` | Supplied input for comma-to-space conversion. |
+| `temperatures/1803.csv` | Supplied input for comma-to-space conversion. |
+| `tab-example.tsv` | Small test input containing an empty field, used for tab-to-comma conversion and line counting. |
+| `silwood_trees_raw.csv` | Synthetic tree-survey records processed by the Assignment 2 cleaner. |
+| `silwood_trees_metadata.md` | Defines the tree-survey fields, validation rules and required outputs. |
+| `trees.csv` | Supplied 120-record table containing Species, Distance.m and Angle.degrees; used for tree-height calculation and the basic R file-I/O exercise. |
+| `pound_hill_data.csv` | Plant species counts and sampling-design labels used by both wrangling scripts and the richness/abundance analysis. |
+| `pound_hill_meta_data.csv` | Semicolon-delimited metadata describing the Pound Hill fields and the meaning of blank species counts. |
+| `bootcamp_observations.csv` | Ordinary observations containing known counts, a missing count and an exact duplicate; used by the Python and R observations exercises. |
+| `bootcamp_observations_boundary.csv` | Boundary observations distinguishing an all-missing site from an observed-zero site, including a duplicate zero record. |
+| `bootcamp_observations_invalid.csv` | Deliberately invalid counts, -1 and many, used for validation checks. |
 
 
-##  Data
+The supplied exercise datasets are from the
+[MulQuaBio course materials](https://mulquabio.github.io/MQB/).
+The consumer–resource dataset is attributed in the course material
+to Barnes et al. (2008), Ecology 89:881.
 
-FASTA and temperature files were supplied with the [MulQuaBio course materials](https://mulquabio.github.io/MQB/) and are kept unchanged.
+Blank Pound Hill species counts represent observed absences and
+are converted to zero according to its metadata. Blank counts in
+the observations exercise instead represent missing observations.
+These dataset-specific rules must not be interchanged.
 
-tab-example.tsv is a small test file containing an empty field. All required inputs are included in `data/`.
+Additional synthetic test cases are defined in test scripts or
+created using the documented temporary-file commands. They are
+not additional source datasets.
 
-The synthetic tree survey and its metadata were supplied with the MulQuaBio practical.
-They are stored unchanged as `data/silwood_trees_raw.csv` and
-`data/silwood_trees_metadata.md`.
+The TIFF conversion demonstration requires expendable TIFF inputs
+supplied by the user; no TIFF fixture is included in this repository.
 
-The supplied tree-height table is stored unchanged as `data/trees.csv`.
-It contains 120 records with the columns `Species`, `Distance.m` and `Angle.degrees`.
-
-The supplied Pound Hill files are stored unchanged as
-`data/pound_hill_data.csv` and `data/pound_hill_meta_data.csv`.
-The metadata specifies that blank species counts represent observed absences, which are converted to zero during analysis.
-
-The observations exercise uses the three supplied
-`bootcamp_observations*.csv` files in `data/`.
-Additional synthetic records are defined directly in the test script.
 
 ## Usage
 
@@ -1146,11 +1201,7 @@ No summary CSV is written.
 Reshapes the Pound Hill dataset from wide to long format using
 `reshape2::melt()`.
 
-Requires R and `reshape2`. If needed, install the package in R:
-
-```r
-install.packages("reshape2")
-```
+Requires `reshape2`; see Requirements for installation.
 
 Run from the repository root:
 
@@ -1178,12 +1229,8 @@ The raw files are only read. No figure is generated.
 Recreates the Pound Hill wide-to-long transformation using
 `tidyr::pivot_longer()` and `dplyr::mutate()`.
 
-Requires R 4.1 or later for the native pipe, plus `dplyr` and `tidyr`.
-Install missing packages in R:
-
-```r
-install.packages(c("dplyr", "tidyr"))
-```
+Requires R 4.1 or later, `dplyr` and `tidyr`;
+see Requirements for installation.
 
 Run from the repository root:
 
@@ -1212,6 +1259,41 @@ should match after sorting. The raw input files are only read.
 ## Testing
 
 ### Assignment 1
+
+### Fresh-clone verification
+
+On 27 November 2026, commit 681a5eb was cloned from origin into
+a new directory. Checks were run from that clone's repository root,
+after deactivating the development Python virtual environment.
+
+| Scope | Result |
+| --- | --- |
+| Delimiter converters | TSV example and all four temperature files completed successfully. |
+| Assignment 2 | Cleaner and independent test script completed successfully. |
+| Assignment 3 | Both tree-height scripts, the shell wrapper and Pound Hill analysis completed successfully. |
+| Python exercises | Twelve demonstration and test scripts completed successfully. |
+| R exercises | Ten non-interactive classroom scripts and the additional basic plotting exercise completed successfully. |
+| Shell checks | All tracked Shell scripts passed syntax checks; four selected demonstrations completed successfully. |
+| Outputs | All 16 checked result files existed and were nonempty. |
+| Input and code protection | `git diff --exit-code HEAD` passed; tracked files were unchanged and the working tree remained clean. |
+
+All batch checks returned exit status 0. These checks establish
+execution and output presence; the detailed numerical, boundary,
+rerun and visual checks are documented below.
+
+Warning searches matched basic_io.R and observations_practice.R logs.
+Their warning details require confirmation against the expected
+append-header and incomplete-final-line warnings documented below.
+
+The batch did not repeat the FASTA commands, interactive browse.R
+debugging or all Shell input scenarios. Earlier checks remain
+documented separately.
+
+TIFF-to-PNG conversion was subsequently tested separately in the
+same fresh clone using ImageMagick 7.1.2-18. Both synthetic test
+images converted successfully, retaining their dimensions and
+showing zero differing pixels. Details are recorded under
+`tiff2_png.sh` below.
 
 #### Changes after formative feedback: FASTA commands
 
@@ -1244,6 +1326,11 @@ The two numbered FASTA files lack a final newline, so their newline
 counts are one lower than their displayed line counts. The decimal
 result printed by `bc` omits the leading zero; this does not change
 its value.
+
+The additional basic plotting exercise and its dedicated input
+were subsequently removed following teaching-assistant advice
+to retain only the requested coursework scope.
+
 
 #### Delimiter converter checks
 
@@ -1291,9 +1378,7 @@ pine,7,16
 Exit statuses were inspected immediately after the relevant commands.
 All rejected input cases reported an error without displaying `Done!`.
 
-Verification of the revised version in a fresh Git checkout is pending.
-The temporary-directory check above tested directory creation, but was
-not a Git checkout test.
+Normal execution and syntax were subsequently checked in the fresh clone; the earlier edge-case checks were not repeated there.
 
 ##### csvtospace.sh: changes after formative feedback
 
@@ -1389,8 +1474,7 @@ being included in the summary.
 | Missing results directory | After supplying the raw CSV to that temporary copy, the cleaner created `results/` and returned status `0`. |
 | Independent temporary copy | All three generated tables matched the working-copy outputs according to `diff`. |
 
-These checks used the current local files. Verification in a newly
-cloned Git repository, following the README commands exactly, is pending.
+The cleaner and independent test script were subsequently rerun successfully in the fresh clone. The detailed output comparisons above were performed during the earlier local checks.
 
 ### Assignment 3
 
@@ -1834,15 +1918,21 @@ to the same file; see Limitations.
 
 #### tiff2_png.sh
 
-During review, the missing `done` was added to close the loop.
-Comments explain the working directory and output naming.
+Actual conversion was subsequently checked in the fresh clone on
+27 November 2026 using ImageMagick 7.1.2-18.
 
-Syntax was checked from the repository root using
-`bash -n code/tiff2_png.sh`; no syntax errors were reported.
+Two synthetic TIFF images were created in a temporary directory:
+red.tif (100 × 60 pixels) and blue sample.tif (80 × 50 pixels).
+Both converted successfully, including the filename containing a space.
+The script returned exit status 0.
 
-Neither `command -v magick` nor `command -v convert` returned a path.
-Actual TIFF-to-PNG conversion and output-image inspection remain
-unverified because the required converter was unavailable.
+identify confirmed PNG output with unchanged dimensions.
+compare -metric AE reported zero differing pixels for both pairs,
+with comparison exit status 0. These checks cover the two synthetic
+solid-colour fixtures, not arbitrary TIFF formats or metadata preservation.
+
+Test files remained outside the repository, and the working tree
+was clean afterwards.
 
 ### Additional classroom exercises: Python
 
@@ -2167,8 +2257,7 @@ Both commands returned exit status `0`.
 | Additional synthetic example | Pound Hill returns `(10, 1)` and Silwood Park returns `(0, 1)`. |
 
 The additional records are invented test data, not real observations.
-Place names were proposed by me; record construction and expected
-results were developed with ChatGPT assistance.
+
 
 ##### Prepared faulty-example critique
 
@@ -2194,8 +2283,7 @@ count was encountered. Ordinary A/B checks do not expose this defect;
 the all-missing C boundary does. The faulty function was rejected
 for reporting, and the normal test script was rerun successfully.
 
-Verification in a fresh Git clone and comparison with a peer's
-fresh run remain pending.
+The report and test script were subsequently rerun successfully in the fresh clone. Comparison with a peer's fresh run remains pending.
 
 #### debugme.py
 
@@ -2591,8 +2679,7 @@ stopifnot(
 q(save = "no")
 ```
 
-All corresponding checks passed without assertion errors. Fresh-clone verification
-remains pending.
+All corresponding checks passed without assertion errors. Normal execution was subsequently verified in the fresh clone.
 
 #### data_wrang_tidy.R
 
@@ -2690,8 +2777,9 @@ All checks passed without warnings or assertion errors.
 The reshape2 reference result had previously been checked against
 every raw species count and its sample identifiers.
 
+Normal execution was subsequently verified in the fresh clone.
 Creation of an absent `results/` directory was reviewed in the code
-but not separately tested. Fresh-clone verification remains pending.
+but not separately tested.
 
 
 ## Limitations
