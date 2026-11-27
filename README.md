@@ -915,6 +915,29 @@ content. The final file includes row names and omits column names;
 it is space-separated despite its `.csv` filename.
 
 
+#### boilerplate.R
+
+Demonstrates a function taking two arguments, printing their values
+and classes, and returning their combined vector.
+
+Requires base R only. No input files, command-line arguments or
+output files are used.
+
+Run from the repository root:
+
+```bash
+Rscript code/boilerplate.R
+```
+
+Alternatively, start R with `R --vanilla`, then enter:
+
+```r
+source("code/boilerplate.R")
+MyFunction(1, 2)
+MyFunction("riki", "Tiki")
+q(save = "no")
+```
+
 
 
 
@@ -1983,6 +2006,21 @@ data matched the input using `all.equal()`.
 
 Running the script again produced the same final output file,
 without accumulating extra rows.
+
+#### boilerplate.R
+
+Clarified comments and spacing while retaining the original function
+and its numeric and character examples.
+
+The Rscript command documented under Usage completed with exit
+status `0`, printing the argument descriptions and the expected
+numeric and character vectors.
+
+Sourcing the script in a clean R session also succeeded.
+`ls()` confirmed that `MyFunction` existed, and `class(MyFunction)`
+returned `"function"`. Explicit calls returned `c(1, 2)` and
+`c("riki", "Tiki")`, alongside the printed argument descriptions.
+
 
 
 
