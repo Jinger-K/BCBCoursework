@@ -1,9 +1,14 @@
-i <- 0 #Initialize i
-while (i < Inf){
-    if (i == 10){
+# Demonstrate exiting a while loop using break.
+# Run from the coursework project root:
+# Rscript code/break.R
+
+i <- 0
+while (i < Inf) {
+    if (i == 10) {
+        # Exit before printing 10.
         break
-    } else { # Break out of the while loop!
-    cat("i equals ", i, "\n")
-    i <- i + 1 #UPdate i}
+    } else {
+        cat("i equals ", i, "\n")
+        i <- i + 1
     }
 }
