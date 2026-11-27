@@ -161,8 +161,8 @@ Additional synthetic test cases are defined in test scripts or
 created using the documented temporary-file commands. They are
 not additional source datasets.
 
-The TIFF conversion demonstration requires expendable TIFF inputs
-supplied by the user; no TIFF fixture is included in this repository.
+No TIFF fixture is committed. The Testing section provides commands
+to generate disposable synthetic TIFF images for conversion checks.
 
 
 ## Usage
@@ -1254,8 +1254,6 @@ should match after sorting. The raw input files are only read.
 
 ## Testing
 
-### Assignment 1
-
 ### Fresh-clone verification
 
 On 27 November 2026, commit 681a5eb was cloned from origin into
@@ -1277,9 +1275,14 @@ All batch checks returned exit status 0. These checks establish
 execution and output presence; the detailed numerical, boundary,
 rerun and visual checks are documented below.
 
-Warning searches matched basic_io.R and observations_practice.R logs.
-Their warning details require confirmation against the expected
-append-header and incomplete-final-line warnings documented below.
+Warning messages were inspected. basic_io.R produced the expected
+`appending column names to file` warning during its append demonstration.
+observations_practice.R reported missing trailing newlines in the three
+supplied CSV files. The records were read successfully, and the source
+files were left unchanged.
+
+The invalid observations file also produced the expected error for -1,
+which was caught by try(). Both scripts completed with exit status 0.
 
 The batch did not repeat the FASTA commands, interactive browse.R
 debugging or all Shell input scenarios. Earlier checks remain
@@ -1296,6 +1299,8 @@ using git pull --ff-only. This update removed the additional basic
 plotting exercise and its dedicated dataset, and revised the README.
 The working tree remained clean. The full test batch was not rerun
 after this cleanup.
+
+### Assignment 1
 
 #### Changes after formative feedback: FASTA commands
 
@@ -1328,10 +1333,6 @@ The two numbered FASTA files lack a final newline, so their newline
 counts are one lower than their displayed line counts. The decimal
 result printed by `bc` omits the leading zero; this does not change
 its value.
-
-The additional basic plotting exercise and its dedicated input
-were subsequently removed following teaching-assistant advice
-to retain only the requested coursework scope.
 
 
 #### Delimiter converter checks
@@ -1928,13 +1929,37 @@ red.tif (100 × 60 pixels) and blue sample.tif (80 × 50 pixels).
 Both converted successfully, including the filename containing a space.
 The script returned exit status 0.
 
-identify confirmed PNG output with unchanged dimensions.
-compare -metric AE reported zero differing pixels for both pairs,
-with comparison exit status 0. These checks cover the two synthetic
+The `identify` command confirmed PNG output with unchanged dimensions.
+The `compare -metric AE` command reported zero differing pixels
+for both pairs, with comparison exit status 0. These checks cover the two synthetic
 solid-colour fixtures, not arbitrary TIFF formats or metadata preservation.
 
 Test files remained outside the repository, and the working tree
 was clean afterwards.
+
+To reproduce the conversion checks, run from the repository root:
+
+```bash
+project_root=$PWD
+tiff_check_dir=$(mktemp -d)
+
+convert -size 100x60 xc:red "$tiff_check_dir/red.tif"
+convert -size 80x50 xc:blue "$tiff_check_dir/blue sample.tif"
+
+cd "$tiff_check_dir"
+bash "$project_root/code/tiff2_png.sh"
+echo "$?"
+
+identify red.tif red.png "blue sample.tif" "blue sample.png"
+
+compare -metric AE red.tif red.png null:
+echo "$?"
+
+compare -metric AE "blue sample.tif" "blue sample.png" null:
+echo "$?"
+
+cd "$project_root"
+```
 
 ### Additional classroom exercises: Python
 
