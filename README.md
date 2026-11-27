@@ -1010,7 +1010,59 @@ then enter:
 source("code/break.R")
 q(save = "no")
 ```
+#### next.R
 
+Demonstrates using `next` to skip even numbers in a loop over 1–10,
+printing only 1, 3, 5, 7 and 9.
+
+Requires base R only. No command-line arguments, input files or
+output files are used.
+
+Run from the repository root:
+
+```bash
+Rscript code/next.R
+```
+
+Alternatively, start R with `R --vanilla` from the repository root,
+then enter:
+
+```r
+source("code/next.R")
+q(save = "no")
+```
+
+#### try.R
+
+Demonstrates catching sampling errors with `try()` using both
+`lapply()` and a preallocated list with a `for` loop.
+
+Requires base R only. No command-line arguments or input files are
+needed. The script creates `results/` if necessary and saves a
+population histogram to `results/try_population.pdf`.
+
+Run from the repository root:
+
+```bash
+Rscript code/try.R
+```
+
+Alternatively, start R with `R --vanilla` from the repository root,
+then enter:
+
+```r
+source("code/try.R")
+q(save = "no")
+```
+
+The script uses `set.seed(1345)`. Each method attempts 15 samples,
+printing means when more than 30 distinct values are sampled.
+Errors remain visible but are caught, allowing subsequent attempts
+to continue. Each result list is printed; the second replaces
+`result` from the first. Successful entries contain text messages,
+while failed entries have class `"try-error"`.
+
+Rerunning replaces the histogram PDF.
 
 
 
@@ -2141,6 +2193,46 @@ terminated normally. Rscript returned exit status `0`.
 After sourcing in a clean R session, entering `i` returned `10`,
 confirming that the loop exited before printing the stopping value.
 
+#### next.R
+
+Corrected the comment to identify even numbers and clarified
+indentation with braces, retaining the original `next` behaviour.
+
+Both execution methods under Usage printed only 1, 3, 5, 7 and 9.
+Rscript returned exit status `0`.
+
+After sourcing in a clean R session, entering `i` returned `10`,
+confirming that the loop reached its final iteration while skipping
+the print statement for even numbers.
+
+#### try.R
+
+Retained the textbook structure and added the preallocated-list
+loop and explicit result inspection. The uncaught-error example
+remains commented out. The histogram is saved under `results/`.
+
+Both execution methods under Usage completed. Rscript returned
+exit status `0`, and the histogram PDF existed with nonzero size.
+
+In the recorded runs, both methods retained 15 results:
+
+| Method | Successful attempts | Failed attempt positions |
+| --- | --- | --- |
+| `lapply()` | 13 | 5, 12 |
+| `for` loop | 12 | 7, 11, 13 |
+
+After sourcing in a clean R session, these additional checks were run:
+
+```r
+class(result)
+length(result)
+class(result[[7]])
+class(result[[15]])
+```
+
+They returned `"list"`, `15`, `"try-error"` and `"character"`,
+respectively, confirming that a failed attempt was stored and
+later attempts still completed.
 
 
 
