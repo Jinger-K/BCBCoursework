@@ -1,5 +1,11 @@
-for (i in 1:10){
-    if ((i %% 2) == 0) # check if the number is odd
-     next # pass to next interation of loop
+# Demonstrate skipping even numbers using next.
+# Run from the coursework project root:
+# Rscript code/next.R
+
+for (i in 1:10) {
+    # Skip the remaining statements for even numbers.
+    if (i %% 2 == 0) {
+        next
+    }
     print(i)
 }
