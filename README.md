@@ -937,6 +937,30 @@ MyFunction(1, 2)
 MyFunction("riki", "Tiki")
 q(save = "no")
 ```
+#### control_flow.R
+
+Demonstrates conditional statements, numeric and character `for` loops,
+and a terminating `while` loop.
+
+Requires base R only. No command-line arguments, input files or output
+files are used.
+
+Run from the repository root:
+
+```bash
+Rscript code/control_flow.R
+```
+
+Alternatively, start R with `R --vanilla` from the repository root,
+then enter:
+
+```r
+source("code/control_flow.R")
+q(save = "no")
+```
+
+The random conditional message appears only when the generated value
+is at most 0.5, so its presence may differ between runs.
 
 
 
@@ -2021,6 +2045,24 @@ Sourcing the script in a clean R session also succeeded.
 returned `"function"`. Explicit calls returned `c(1, 2)` and
 `c("riki", "Tiki")`, alongside the printed argument descriptions.
 
+#### control_flow.R
+
+Corrected the square-message spelling, standardised formatting and
+clarified comments. Updated the conditional message to match `<= 0.5`,
+retaining the original conditions and loops.
+
+Both execution methods under Usage succeeded. Rscript returned exit
+status `0`, and sourcing was checked in a clean R session.
+
+The outputs matched expectations: the TRUE-branch message, square
+descriptions for integers 1–10, three species names, `"a"`, `"bc"`,
+`"def"`, and the while-loop squares from 1 to 100. Neither recorded run
+printed the random conditional message, which is valid behaviour.
+
+Separate interactive checks used `a <- FALSE` and repeated the
+conditional block, confirming the FALSE-branch message. Testing
+`z <= 0.5` with 0.4, 0.5 and 0.6 produced the conditional message for
+the first two values only, confirming that equality is included.
 
 
 

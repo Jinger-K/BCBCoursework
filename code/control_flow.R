@@ -1,38 +1,43 @@
-# if statements
+# Demonstrate conditional statements, for loops and a while loop.
+# Run from the coursework project root:
+# Rscript code/control_flow.R
+
+# Select a branch using a logical value.
 a <- TRUE
 if (a) {
-    print ("a is TRUE")
+    print("a is TRUE")
 } else {
-    print ("a is FALSE")
+    print("a is FALSE")
 }
 
-z <- runif(1) ## Generate a uniformly distributed random number
-if (z <= 0.5){
-    print ("Less than a half")
+# Print a message only when the random value is at most 0.5.
+z <- runif(1)
+if (z <= 0.5) {
+    print("Less than or equal to a half")
 }
 
-
-# for loops
+# Calculate and print the squares of integers from 1 to 10.
 for (i in 1:10) {
     j <- i * i
-    print(paste(i, " suqare is", j ))
+    print(paste(i, "squared is", j))
 }
 
-for(species in c('Heliodoxa rubinoides', 
-                 'Boissonneaua jardini', 
-                 'Sula nebouxii')) {
-      print(paste('The species is', species))
+# Loop over a vector of species names.
+for (species in c("Heliodoxa rubinoides",
+                  "Boissonneaua jardini",
+                  "Sula nebouxii")) {
+    print(paste("The species is", species))
 }
 
-v1 <- c("a","bc","def")
+# Loop over an existing character vector.
+v1 <- c("a", "bc", "def")
 for (i in v1) {
     print(i)
 }
 
-
-# while loops
+# Increment before printing, producing squares from 1 to 100.
 i <- 0
 while (i < 10) {
-    i <- i+1
+    i <- i + 1
     print(i^2)
 }
