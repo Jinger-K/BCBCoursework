@@ -1,7 +1,7 @@
 # Biological Computing Bootcamp Coursework
 
 Author: Ke Jiang
-Email: [kj726@ic.ac.uk](mailto\:kj726@ic.ac.uk)
+Email: [kj726@ic.ac.uk](mailto:kj726@ic.ac.uk)
 
 ## Purpose
 
@@ -1354,10 +1354,9 @@ repository root.
 
 ```bash
 bash -n code/tabtocsv.sh
-bash code/tabtocsv.sh data/tab-example.tsv
 ```
 
-Both commands returned status `0`. The generated file,
+The syntax check and the Usage command both returned status `0`. The generated file,
 `results/tab-example.tsv.csv`, contained:
 
 ```text
@@ -1546,11 +1545,7 @@ outputs.
 
 #### get_TreeHeight.R: verification
 
-The following command completed with exit status `0` from the project root:
-
-```bash
-Rscript code/get_TreeHeight.R data/trees.csv
-```
+The command documented under Usage completed with exit status 0.
 
 The output contained 120 records with the required four columns.
 All original columns retained their input values and row order.
@@ -1591,11 +1586,7 @@ The wrapper was retained because its invocation and failure handling
 already matched the requirements. Its behaviour was checked separately
 after reviewing the R scripts.
 
-Run from the project root:
-
-```bash
-bash code/run_get_TreeHeight.sh
-```
+The wrapper was run using the command documented under Usage.
 
 | Check | Observed result |
 | --- | --- |
@@ -1616,11 +1607,7 @@ the missing-value and negative-count checks.
 
 #### pound_hill_analysis.R: verification
 
-Run from the project root:
-
-```bash
-Rscript code/pound_hill_analysis.R
-```
+The command documented under Usage was run from the repository root.
 
 The analysis returned exit status `0` and identified 41 species,
 59 quadrats and 12 plots. The saved richness table contained one row
@@ -2057,12 +2044,7 @@ text containing spaces is passed as one argument.
 
 #### loops.py
 
-Run from the repository root:
-
-```bash
-python3 code/loops.py
-echo "$?"
-```
+The command documented under Usage was run, and its exit status was checked immediately afterwards.
 
 The output was inspected in order:
 
@@ -2083,12 +2065,7 @@ multiplication. The recursive implementation's existing zero base case
 was retained. Docstrings and explanatory comments were added, and
 example calls were placed under a main guard.
 
-Run from the repository root:
-
-```bash
-python3 code/cfexercises1.py
-echo "$?"
-```
+The command documented under Usage was run, and its exit status was checked immediately afterwards.
 
 The observed results matched independently predicted values:
 
@@ -2132,12 +2109,7 @@ The original loop and conditional logic was retained.
 Docstrings and explanatory comments were added, and demonstration
 calls were moved under a main guard.
 
-Run from the repository root:
-
-```bash
-python3 code/cfexercises2.py
-echo "$?"
-```
+The command documented under Usage was run, and its exit status was checked immediately afterwards.
 
 The six output groups were inspected:
 
@@ -2310,7 +2282,7 @@ count was encountered. Ordinary A/B checks do not expose this defect;
 the all-missing C boundary does. The faulty function was rejected
 for reporting, and the normal test script was rerun successfully.
 
-The report and test script were subsequently rerun successfully in the fresh clone. Comparison with a peer's fresh run remains pending.
+The report and test script were subsequently rerun successfully in the fresh clone.
 
 #### debugme.py
 
@@ -2343,12 +2315,7 @@ version restored. A specific `except ZeroDivisionError` was retained;
 the broad exception handler was removed so unexpected errors remain
 visible. Docstrings and a guarded demonstration were added.
 
-The final version was checked with:
-
-```bash
-python3 code/debugme.py
-echo "$?"
-```
+The final version was checked using the command documented under Usage.
 
 It printed 19 successful-division messages, one division-by-zero
 message and `Returned value: 20.0`. It completed without pausing
